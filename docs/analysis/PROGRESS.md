@@ -8,44 +8,33 @@
 
 ## Phase 2: Entropy Coding
 - [x] 05-ans-entropy (ans_common/params/enc_ans/dec_ans, alias tables, hybrid integers, encoding/decoding)
-- [ ] 06-ans-encoder (MERGED into 05)
-- [ ] 07-hybrid-integers (MERGED into 05)
 - [x] 08-histogram-clustering (enc_cluster, context maps, LZ77, block context)
-- [ ] 09-lz77 (MERGED into 08)
-- [ ] 10-context-modeling (MERGED into 08)
 
 ## Phase 3: Color Science
-- [ ] 11-xyb-color-space (opsin absorbance, XYB encoding)
+- [x] 11-xyb-color-space (opsin absorbance, XYB encoding)
 - [ ] 12-transfer-functions (sRGB, PQ, HLG, gamma)
 - [ ] 13-color-management (CMS interface, ICC profiles)
 - [ ] 14-tone-mapping (HDR→SDR, display adaptation)
 
 ## Phase 4: Transforms + Quantization
-- [ ] 15-dct-family (DCT-II/III, sizes, SIMD)
+- [x] 15-dct-family (DCT-II/III, sizes, SIMD)
 - [x] 16-ac-strategy (block size selection heuristics, COST FUNCTIONS)
 - [ ] 17-coefficient-order (scan order optimization)
-- [ ] 18-quantization (quant matrices, DC/AC quantization, MULTIPLIERS)
+- [x] 18-quantization (quant matrices, DC/AC quantization, MULTIPLIERS)
 
 ## Phase 5: Perceptual Models
-- [ ] 19-butteraugli (perceptual distance metric)
+- [x] 19-butteraugli (perceptual distance metric)
 - [x] 20-adaptive-quantization (AQ masking, DECISION TREES, COST ANALYSIS)
-- [ ] 21-gaborish (edge enhancement filter)
+- [x] 21-gaborish (edge enhancement filter)
 
 ## Phase 6: Modular Path
-- [ ] 22-modular-overview (when and why modular)
-- [ ] 23-rct (Reversible Color Transform)
-- [ ] 24-squeeze (Haar-like decorrelation)
-- [ ] 25-palette (indexed color)
-- [ ] 26-prediction-trees (MA trees, context prediction)
+- [x] 22-modular-overview (when and why modular, RCT, squeeze, palette, MA trees)
 
 ## Phase 7: Features
-- [ ] 27-patches (patch dictionary)
-- [ ] 28-splines (parametric curves)
-- [ ] 29-noise (photon/film noise synthesis)
-- [ ] 30-chroma-from-luma (CfL for JPEG transcoding)
+- [x] 27-features (patches, splines, noise, CfL — combined into one note)
 
 ## Phase 8: Encoder Pipeline
-- [ ] 31-pipeline-overview (full encoder flow, DECISION TREE)
+- [x] 31-pipeline-overview (full encoder flow, DECISION TREE)
 - [ ] 32-frame-setup (FrameHeader, metadata, params)
 - [ ] 33-vardct-path (heuristics → DCT → quant → tokens, COST ANALYSIS)
 - [ ] 34-group-encoding (256×256 groups, parallel encoding)
@@ -56,3 +45,21 @@
 - [ ] 37-highway-simd (HWY abstraction, -inl.h pattern)
 - [ ] 38-render-pipeline (decoder pipeline reference)
 - [ ] 39-threading (ThreadPool, RunOnPool, group parallelism)
+
+## Chapters Written
+- [x] foundations/base-primitives.md
+- [x] foundations/memory-model.md
+- [x] foundations/serialization.md
+- [x] foundations/bit-io.md
+- [x] entropy/ans-theory.md
+- [x] entropy/ans-implementation.md
+- [x] entropy/hybrid-integers.md
+- [x] entropy/histogram-clustering.md
+- [x] entropy/lz77.md
+- [x] entropy/context-modeling.md
+
+## Remaining Analyses Needed
+- 12-transfer-functions, 13-color-management, 14-tone-mapping
+- 17-coefficient-order
+- 32-frame-setup, 33-vardct-path, 34-group-encoding, 35-progressive, 36-bitstream-assembly
+- 37-highway-simd, 38-render-pipeline, 39-threading
