@@ -8,6 +8,8 @@
 - [Memory Model](foundations/memory-model.md)
 - [Serialization](foundations/serialization.md)
 - [Bit I/O](foundations/bit-io.md)
+- [Container Format](foundations/container-format.md)
+- [Input Formats & Extra Channels](foundations/input-formats.md)
 
 # Entropy Coding
 
@@ -24,6 +26,7 @@
 - [Transfer Functions](color/transfer-functions.md)
 - [Color Management](color/color-management.md)
 - [Tone Mapping](color/tone-mapping.md)
+- [ICC Profile Encoding](color/icc-encoding.md)
 
 # Transforms & Quantization
 
@@ -36,6 +39,7 @@
 
 - [Butteraugli](perceptual/butteraugli.md)
 - [Adaptive Quantization](perceptual/adaptive-quantization.md)
+- [Butteraugli Feedback Loop](perceptual/butteraugli-loop.md)
 - [Gaborish](perceptual/gaborish.md)
 
 # Modular Coding
@@ -52,6 +56,8 @@
 - [Splines](features/splines.md)
 - [Noise Synthesis](features/noise.md)
 - [Chroma from Luma](features/chroma-from-luma.md)
+- [Animation & Multi-Frame](features/animation.md)
+- [JPEG Re-encoding](features/jpeg-reencoding.md)
 
 # Encoder Pipeline
 
@@ -60,6 +66,7 @@
 - [VarDCT Path](encoder/vardct-path.md)
 - [Group Encoding](encoder/group-encoding.md)
 - [Progressive Encoding](encoder/progressive.md)
+- [LfFrame (DC Frame)](encoder/lf-frame.md)
 - [Bitstream Assembly](encoder/bitstream-assembly.md)
 
 # Architecture
