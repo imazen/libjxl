@@ -29,8 +29,8 @@ perceptual optimization, transform coding, entropy coding, and bitstream
 assembly. Every phase is gated by the speed tier, which controls the
 quality-vs-speed tradeoff.
 
-Source: `enc_frame.cc`, `enc_frame.h`, `enc_heuristics.cc`, `enc_cache.cc`,
-`enc_group.cc`
+Source: [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc), [`enc_frame.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.h), [`enc_heuristics.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_heuristics.cc), [`enc_cache.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_cache.cc),
+[`enc_group.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_group.cc)
 
 ## Entry Point
 
@@ -66,7 +66,7 @@ no lossy palette, compatible color transform.
 
 ## Phase 2: Frame Header
 
-`MakeFrameHeader` (`enc_frame.cc:319`) sets:
+`MakeFrameHeader` ([`enc_frame.cc:319`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L319)) sets:
 - Encoding mode (VarDCT vs Modular)
 - Group size shift (modular: varies by image size)
 - Frame flags (noise, patches)
@@ -76,7 +76,7 @@ no lossy palette, compatible color transform.
 
 ## Phase 3: Input Processing
 
-`ComputeEncodingData` (`enc_frame.cc:1470`):
+`ComputeEncodingData` ([`enc_frame.cc:1470`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L1470)):
 1. Copy input pixels from chunked adapter
 2. Color transform to XYB (if applicable)
 3. Optionally preserve linear RGB for butteraugli RD loop (speed ≤ Kitten (2))

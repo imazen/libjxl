@@ -22,7 +22,7 @@ A JPEG XL file is either a **bare codestream** (starting with `0xFF 0x0A`) or a
 **container** wrapping the codestream with metadata boxes. The container uses
 ISOBMFF (ISO Base Media File Format) box structure with big-endian encoding.
 
-Source: `encode.cc`, `encode_internal.h`, `decode.cc`, `box_content_decoder.cc`
+Source: [`encode.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/encode.cc), [`encode_internal.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/encode_internal.h), [`decode.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/decode.cc), [`box_content_decoder.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/box_content_decoder.cc)
 
 ## When Container Is Required
 

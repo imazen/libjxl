@@ -19,8 +19,8 @@ Tone mapping compresses the dynamic range of HDR content to fit within an SDR
 display's capabilities. libjxl implements the Rec. 2408 tone mapper for PQ
 content and the HLG OOTF for scene-to-display conversion.
 
-Source: `cms/tone_mapping.h`, `cms/tone_mapping-inl.h`, `cms/jxl_cms.cc`,
-`cms/jxl_cms_internal.h`
+Source: [`cms/tone_mapping.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/tone_mapping.h), [`cms/tone_mapping-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/tone_mapping-inl.h), [`cms/jxl_cms.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc),
+[`cms/jxl_cms_internal.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms_internal.h)
 
 ## Rec. 2408 Tone Mapper
 
@@ -111,7 +111,7 @@ The OOTF is skipped when `|exponent| < 0.01` (gamma very close to 1.0).
 
 ### Integration with CMS Pipeline
 
-In `ApplyHlgOotf` (`jxl_cms.cc:857`), the OOTF is skipped entirely when
+In `ApplyHlgOotf` ([`jxl_cms.cc:857`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc#L857)), the OOTF is skipped entirely when
 `intensity_target` is in [295, 305], since gamma ≈ 1.0 at ~300 nits.
 
 When crossing between HLG and non-HLG color spaces
@@ -121,7 +121,7 @@ When crossing between HLG and non-HLG color spaces
 
 ## Gamut Mapping
 
-`GamutMap` (`tone_mapping-inl.h:138`) desaturates out-of-gamut pixels by
+`GamutMap` ([`cms/tone_mapping-inl.h:138`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/tone_mapping-inl.h#L138)) desaturates out-of-gamut pixels by
 mixing with gray at the same luminance:
 
 ```
@@ -146,7 +146,7 @@ mixing with gray at the same luminance:
 
 ## ICC 3D LUT Tone Mapping
 
-For HDR profiles embedded in ICC, `ToneMapPixel` (`jxl_cms_internal.h:128`)
+For HDR profiles embedded in ICC, `ToneMapPixel` ([`jxl_cms_internal.h:128`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms_internal.h#L128))
 performs per-pixel tone mapping for the 9×9×9 3D LUT:
 
 1. Convert encoded to linear via PQ (at 10000 nits) or HLG EOTF

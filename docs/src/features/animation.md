@@ -28,8 +28,8 @@ incremental updates. Each frame carries its own duration, blending mode, and
 spatial position. Four reference frame slots enable complex compositing without
 re-encoding unchanged content.
 
-Source: `headers.h`, `headers.cc`, `frame_header.h`, `frame_header.cc`,
-`enc_frame.h`, `enc_frame.cc`
+Source: [`headers.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.h), [`headers.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.cc), [`frame_header.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h), [`frame_header.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.cc),
+[`enc_frame.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.h), [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc)
 
 ## AnimationHeader
 
@@ -52,7 +52,7 @@ Frame duration in seconds = `frame.duration × tps_denominator / tps_numerator`.
 NTSC framerate (29.97 fps) encodes as `30000/1001` — both values have cheap
 2-bit representations.
 
-Source: `headers.h:77-90`, `headers.cc:184-196`
+Source: [`headers.h:77-90`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.h#L77-L90), [`headers.cc:184-196`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.cc#L184-L196)
 
 ## Per-Frame Fields
 
@@ -103,7 +103,7 @@ Each frame specifies how it composites with a reference frame:
 Encoding: `Val(0), Val(1), Val(2), BitsOffset(2, 3)` — Replace costs 0 bits
 (most common).
 
-Source: `frame_header.h:181-210`
+Source: [`frame_header.h:181-210`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h#L181-L210)
 
 ## BlendingInfo
 
@@ -140,7 +140,7 @@ save_as_reference: uint32  // 0-3, which slot to save into
 blending). Slot 3 is reserved for internally-generated frames. Slots 0 and 2
 are available for layered compositing.
 
-Source: `frame_header.h:425-428`, `dec_frame.cc:803-813`
+Source: [`frame_header.h:425-428`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h#L425-L428), [`dec_frame.cc:803-813`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_frame.cc#L803-L813)
 
 ## Frame Cropping
 

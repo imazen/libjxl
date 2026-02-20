@@ -15,7 +15,7 @@ Images are divided into independent groups for parallel encoding and decoding.
 Each group is encoded into a separate bitstream section with its own byte
 alignment.
 
-Source: `enc_frame.cc`, `enc_group.cc`, `frame_dimensions.h`, `toc.h`
+Source: [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc), [`enc_group.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_group.cc), [`frame_dimensions.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_dimensions.h), [`toc.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/toc.h)
 
 ## Group Structure
 
@@ -47,7 +47,7 @@ AcGroupIndex(pass, group, num_groups, num_dc_groups) =
 
 ## EncodeGroups Pipeline
 
-`EncodeGroups` (`enc_frame.cc:1299`) allocates one `BitWriter` per TOC entry:
+`EncodeGroups` ([`enc_frame.cc:1299`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L1299)) allocates one `BitWriter` per TOC entry:
 
 ### Phase 1: DC Global (serial)
 

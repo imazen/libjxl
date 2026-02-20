@@ -17,8 +17,8 @@ distinct modes handle different scenarios: single-channel compaction,
 multi-channel explicit palettes for lossless, and lossy palettes with error
 diffusion and implicit color quantization.
 
-Source: `modular/transform/enc_palette.h`, `modular/transform/enc_palette.cc`,
-`modular/transform/palette.h`
+Source: [`modular/transform/enc_palette.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_palette.h), [`modular/transform/enc_palette.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_palette.cc),
+[`modular/transform/palette.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/palette.h)
 
 ## Single-Channel Palette (ChannelCompact)
 

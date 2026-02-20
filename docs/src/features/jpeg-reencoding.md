@@ -25,8 +25,8 @@ JXL codestream (benefiting from JXL's superior entropy coding), while JPEG
 structural metadata goes into a `jbrd` (JPEG Bitstream Reconstruction Data)
 sidecar box.
 
-Source: `jpeg/jpeg_data.h`, `jpeg/enc_jpeg_data.cc`, `jpeg/enc_jpeg_data_reader.cc`,
-`jpeg/dec_jpeg_data.cc`, `jpeg/dec_jpeg_data_writer.cc`, `decode_to_jpeg.h`
+Source: [`jpeg/jpeg_data.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/jpeg_data.h), [`jpeg/enc_jpeg_data.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/enc_jpeg_data.cc), [`jpeg/enc_jpeg_data_reader.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/enc_jpeg_data_reader.cc),
+[`jpeg/dec_jpeg_data.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/dec_jpeg_data.cc), [`jpeg/dec_jpeg_data_writer.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/dec_jpeg_data_writer.cc), [`decode_to_jpeg.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/decode_to_jpeg.h)
 
 ## JPEGData Structure
 
@@ -175,7 +175,7 @@ data), pads the final MCU with the recorded `padding_bits`, and inserts
 `extra_zero_runs` at their recorded positions. The result is byte-identical
 to the original JPEG.
 
-Source: `jpeg/dec_jpeg_data_writer.cc:321-400`
+Source: [`jpeg/dec_jpeg_data_writer.cc:321-400`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/jpeg/dec_jpeg_data_writer.cc#L321-L400)
 
 ## Speed Tier Gating
 

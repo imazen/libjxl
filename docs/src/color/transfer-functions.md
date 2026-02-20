@@ -21,7 +21,7 @@ Transfer functions convert between linear light values and nonlinear encoded
 values. libjxl implements all standard transfer functions with both exact scalar
 formulas and fast SIMD approximations using rational polynomials via Highway.
 
-Source: `cms/transfer_functions.h`, `cms/transfer_functions-inl.h`
+Source: [`cms/transfer_functions.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/transfer_functions.h), [`cms/transfer_functions-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/transfer_functions-inl.h)
 
 ## sRGB
 
@@ -45,7 +45,7 @@ else:
 
 ### SIMD Implementation
 
-The SIMD path (`TF_SRGB` in `transfer_functions-inl.h:215`) replaces the
+The SIMD path (`TF_SRGB` in [`transfer_functions-inl.h:215`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/transfer_functions-inl.h#L215)) replaces the
 expensive `pow()` with 4/4-degree rational polynomial approximations evaluated
 via `EvalRationalPolynomial`.
 
@@ -71,7 +71,7 @@ Both paths use copysign mirroring for negative inputs to support unbounded CMM.
 
 ### Fast Approximation
 
-`FastLinearToSRGB` (`transfer_functions-inl.h:279`) provides a faster path with
+`FastLinearToSRGB` ([`transfer_functions-inl.h:279`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/transfer_functions-inl.h#L279)) provides a faster path with
 max error 1.2e-4. It reconstructs `v^(1/2.4)` by decomposing the IEEE 754
 float into mantissa and exponent:
 

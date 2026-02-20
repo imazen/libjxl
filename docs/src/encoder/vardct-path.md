@@ -47,12 +47,12 @@ and decoder-in-the-loop optimization described below are VarDCT-specific.
 For the modular (lossless/near-lossless) path, see
 [Modular Overview](../modular/modular-overview.md).
 
-Source: `enc_heuristics.cc`, `enc_cache.cc`, `enc_group.cc`,
-`enc_adaptive_quantization.cc`
+Source: [`enc_heuristics.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_heuristics.cc), [`enc_cache.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_cache.cc), [`enc_group.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_group.cc),
+[`enc_adaptive_quantization.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.cc)
 
 ## Heuristics Pipeline
 
-`LossyFrameHeuristics` (`enc_heuristics.cc`) is the core decision engine.
+`LossyFrameHeuristics` ([`enc_heuristics.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_heuristics.cc)) is the core decision engine.
 Its internal dependency graph:
 
 ```

@@ -87,7 +87,7 @@ CMOV instructions.
 
 ## Alias Table Construction (Robin Hood Method)
 
-`InitAliasTable()` (`ans_common.cc:42-146`) distributes symbol frequencies across
+`InitAliasTable()` ([`ans_common.cc:42-146`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/ans_common.cc#L42-L146)) distributes symbol frequencies across
 table entries:
 
 1. Each entry covers `entry_size = TAB_SIZE >> log_alpha_size` positions

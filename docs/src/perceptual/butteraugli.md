@@ -34,7 +34,7 @@ color space, applies visual masking, detects structured errors via oriented
 cross-feature detectors (Malta), and aggregates into a single distance score.
 It is the quality metric that drives all of JPEG XL's encoding decisions.
 
-Source: `butteraugli/butteraugli.cc` (~2200 lines), `butteraugli/butteraugli.h`
+Source: [`butteraugli/butteraugli.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/butteraugli/butteraugli.cc) (~2200 lines), [`butteraugli/butteraugli.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/butteraugli/butteraugli.h)
 
 ## Pipeline Overview
 

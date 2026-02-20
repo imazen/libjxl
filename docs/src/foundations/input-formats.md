@@ -28,7 +28,7 @@ flowchart TD
 The encoder accepts pixels in multiple data types and channel layouts.
 Internally, all pixel data is converted to planar float32 for processing.
 
-Source: `enc_external_image.cc`, `image_metadata.h`, `codestream_header.h`
+Source: [`enc_external_image.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_external_image.cc), [`image_metadata.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/image_metadata.h), [`codestream_header.h`](https://github.com/libjxl/libjxl/blob/main/lib/include/jxl/codestream_header.h)
 
 ## Pixel Data Types
 
@@ -69,7 +69,7 @@ Normalized (exponent ∈ [1, 30]):
     mantissa32 = mantissa16 << 13       // 10 to 23 bits
 ```
 
-Source: `base/float.h:22-43`
+Source: [`base/float.h:22-43`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/float.h#L22-L43)
 
 ## Endianness
 

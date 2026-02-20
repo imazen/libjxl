@@ -15,8 +15,8 @@ flowchart TD
 Frame setup creates the `FrameHeader` and `FrameDimensions` from compression
 parameters. These structures control every downstream encoding decision.
 
-Source: `frame_header.h`, `frame_dimensions.h`, `enc_frame.cc`,
-`enc_params.h`
+Source: [`frame_header.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h), [`frame_dimensions.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_dimensions.h), [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc),
+[`enc_params.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_params.h)
 
 ## FrameHeader
 
@@ -69,7 +69,7 @@ num_dc_groups = ceil(width/dc_group_dim) × ceil(height/dc_group_dim)
 
 ## MakeFrameHeader Logic
 
-`MakeFrameHeader` (`enc_frame.cc:319`) decision tree:
+`MakeFrameHeader` ([`enc_frame.cc:319`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L319)) decision tree:
 
 ### Encoding Mode
 - JPEG transcode → force VarDCT

@@ -21,7 +21,7 @@ decorrelates along human cone response axes, applies a cube-root perceptual
 nonlinearity, then forms opponent channels. The result: quantization noise in
 XYB maps roughly uniformly to perceptual distortion.
 
-Source: `enc_xyb.cc`, `dec_xyb.cc`, `dec_xyb-inl.h`, `cms/opsin_params.h`
+Source: [`enc_xyb.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_xyb.cc), [`dec_xyb.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_xyb.cc), [`dec_xyb-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_xyb-inl.h), [`cms/opsin_params.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/opsin_params.h)
 
 ## Forward Transform: Linear RGB → XYB
 
@@ -68,7 +68,7 @@ The cube root (γ = 1/3) approximates the ~0.38–0.43 power law of human
 contrast perception. XYB uses 1/3 specifically because cubing is fast on the
 decoder side — just two multiplies — while the perceptual accuracy is acceptable.
 
-The SIMD implementation (`CubeRootAndAdd`, `fast_math-inl.h:179`) uses:
+The SIMD implementation (`CubeRootAndAdd`, [`fast_math-inl.h:179`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/fast_math-inl.h#L179)) uses:
 1. IEEE-754 float bit trick for initial approximation (multiply exponent by -1/3)
 2. Three Newton-Raphson iterations: `r = (4/3)r - (x/3)r⁴`
 3. Final refinement: `r = r + (1/3)(r - xr⁴)`

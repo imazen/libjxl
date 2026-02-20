@@ -20,8 +20,8 @@ fixed context models with a learned decision tree that selects per-pixel: which
 predictor to use, which ANS context for the residual, and optional
 quantization parameters.
 
-Source: `modular/encoding/context_predict.h`, `modular/encoding/dec_ma.h`,
-`modular/encoding/enc_ma.h`, `modular/encoding/enc_ma.cc`
+Source: [`modular/encoding/context_predict.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/context_predict.h), [`modular/encoding/dec_ma.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/dec_ma.h),
+[`modular/encoding/enc_ma.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/enc_ma.h), [`modular/encoding/enc_ma.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/enc_ma.cc)
 
 ## Properties
 
@@ -95,7 +95,7 @@ iteration.
 
 ## Tree Learning
 
-`FindBestSplit` (`enc_ma.cc`) uses greedy top-down splitting:
+`FindBestSplit` ([`enc_ma.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/enc_ma.cc)) uses greedy top-down splitting:
 
 1. For each candidate node, try all properties and all split values
 2. Compute entropy cost (Shannon entropy + extra bits) for left/right halves

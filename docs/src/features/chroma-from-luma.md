@@ -25,8 +25,8 @@ channels from the Y channel using a per-tile linear model. The encoder
 optimizes the prediction factor for each 64×64 tile using a smoothed cost
 function with Newton's method.
 
-Source: `chroma_from_luma.h`, `chroma_from_luma.cc`, `enc_chroma_from_luma.h`,
-`enc_chroma_from_luma.cc`
+Source: [`chroma_from_luma.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/chroma_from_luma.h), [`chroma_from_luma.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/chroma_from_luma.cc), [`enc_chroma_from_luma.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_chroma_from_luma.h),
+[`enc_chroma_from_luma.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_chroma_from_luma.cc)
 
 ## The CfL Model
 

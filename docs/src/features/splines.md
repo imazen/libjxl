@@ -16,7 +16,7 @@ spline carries a color profile (in XYB) and width parameter along its length,
 encoded as 32-coefficient DCTs. The decoder renders splines by splatting
 Gaussian blobs along the curve.
 
-Source: `splines.h`, `enc_splines.h`, `enc_splines.cc`
+Source: [`splines.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/splines.h), [`enc_splines.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_splines.h), [`enc_splines.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_splines.cc)
 
 ## Key Types
 

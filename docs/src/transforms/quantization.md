@@ -23,7 +23,7 @@ a single `quant_dc` for all DC coefficients, and a per-block `quant_ac` for AC
 coefficients. On top of this, 17 quantization weight matrices (one per transform type)
 define per-coefficient sensitivity across the frequency plane.
 
-Source: `quantizer.h/cc`, `quant_weights.h/cc`, `quantizer-inl.h`, `enc_quant_weights.cc`
+Source: [`quantizer.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/quantizer.h), [`quantizer.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/quantizer.cc), [`quant_weights.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/quant_weights.h), [`quant_weights.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/quant_weights.cc), [`quantizer-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/quantizer-inl.h), [`enc_quant_weights.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_quant_weights.cc)
 
 ## The Global Scale Hierarchy
 
@@ -66,7 +66,7 @@ extreme sensitivity to DC-level color shifts in the opponent channel.
 
 ## InitialQuantDC: Distance to DC Quantization
 
-`enc_adaptive_quantization.cc:1250-1262`
+[`enc_adaptive_quantization.cc:1250-1262`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.cc#L1250-L1262)
 
 ```
 kDcQuantPow = 0.83

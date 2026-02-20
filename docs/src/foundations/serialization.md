@@ -20,13 +20,13 @@ graph LR
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| `field_encodings.h` | 134 | `Fields` base class, `U32Distr`, `U32Enc`, `Val()`, `Bits()`, `BitsOffset()` |
-| `fields.h` | 369 | `Visitor` base, `VisitorBase`, `Bundle` namespace, coder declarations |
-| `fields.cc` | 595 | `InitVisitor`, `SetDefaultVisitor`, `AllDefaultVisitor`, `ReadVisitor`, `CanEncodeVisitor` |
-| `enc_fields.cc` | 253 | `WriteVisitor`, all `*Coder::Write` functions |
-| `headers.h/cc` | 300 | `SizeHeader`, `PreviewHeader`, `AnimationHeader` |
-| `image_metadata.h/cc` | 917 | `BitDepth`, `ExtraChannelInfo`, `ToneMapping`, `ImageMetadata` |
-| `frame_header.h/cc` | 1023 | `FrameHeader`, `BlendingInfo`, `Passes`, `LoopFilter` |
+| [`field_encodings.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/field_encodings.h) | 134 | `Fields` base class, `U32Distr`, `U32Enc`, `Val()`, `Bits()`, `BitsOffset()` |
+| [`fields.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/fields.h) | 369 | `Visitor` base, `VisitorBase`, `Bundle` namespace, coder declarations |
+| [`fields.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/fields.cc) | 595 | `InitVisitor`, `SetDefaultVisitor`, `AllDefaultVisitor`, `ReadVisitor`, `CanEncodeVisitor` |
+| [`enc_fields.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_fields.cc) | 253 | `WriteVisitor`, all `*Coder::Write` functions |
+| [`headers.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.h), [`headers.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/headers.cc) | 300 | `SizeHeader`, `PreviewHeader`, `AnimationHeader` |
+| [`image_metadata.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/image_metadata.h), [`image_metadata.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/image_metadata.cc) | 917 | `BitDepth`, `ExtraChannelInfo`, `ToneMapping`, `ImageMetadata` |
+| [`frame_header.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h), [`frame_header.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.cc) | 1023 | `FrameHeader`, `BlendingInfo`, `Passes`, `LoopFilter` |
 
 ## The Visitor Pattern
 
@@ -185,7 +185,7 @@ the entire region.
 
 ## Key Headers
 
-### FrameHeader (`frame_header.h:330`)
+### FrameHeader (`[[`frame_header.h:330`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h#L330)](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h#L330)`)
 
 | Field | Type | Default | Condition |
 |-------|------|---------|-----------|
@@ -199,7 +199,7 @@ the entire region.
 | `passes` | Nested | (1 pass) | !kReferenceOnly |
 | `loop_filter` | Nested | (gab+epf) | always |
 
-### ImageMetadata (`image_metadata.h:201`)
+### ImageMetadata (`[[`image_metadata.h:201`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/image_metadata.h#L201)](https://github.com/libjxl/libjxl/blob/main/lib/jxl/image_metadata.h#L201)`)
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
@@ -209,7 +209,7 @@ the entire region.
 | `color_encoding` | Nested | — | always |
 | `intensity_target` | F16 | 255.0 | if extra_fields |
 
-### LoopFilter (`loop_filter.h:20`)
+### LoopFilter (`[[`loop_filter.h:20`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/loop_filter.h#L20)](https://github.com/libjxl/libjxl/blob/main/lib/jxl/loop_filter.h#L20)`)
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|

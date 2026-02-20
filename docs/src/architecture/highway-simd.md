@@ -20,7 +20,7 @@ intrinsics appear anywhere in libjxl source. A single source file is compiled
 multiple times (once per instruction set target), and a runtime CPU check
 dispatches to the best available implementation.
 
-Source: `base/fast_math-inl.h`, `base/rational_polynomial-inl.h`, `simd_util.h`,
+Source: [`base/fast_math-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/fast_math-inl.h), [`base/rational_polynomial-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/rational_polynomial-inl.h), [`simd_util.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/simd_util.h),
 Highway headers
 
 ## The `-inl.h` Mechanism
@@ -32,7 +32,7 @@ libjxl.
 ### Toggling Include Guard
 
 Standard include guards prevent re-inclusion. The `-inl.h` files use a
-toggling guard that *allows* it. From `fast_math-inl.h:10`:
+toggling guard that *allows* it. From [`fast_math-inl.h:10`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/fast_math-inl.h#L10):
 
 ```cpp
 #if defined(LIB_JXL_BASE_FAST_MATH_INL_H_) == defined(HWY_TARGET_TOGGLE)

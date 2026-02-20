@@ -30,7 +30,7 @@ encoding, decoding, measuring perceptual distortion with butteraugli, and
 adjusting. This is the highest-quality path in the encoder, producing per-block
 quantization that closely matches the target perceptual distance.
 
-Source: `enc_adaptive_quantization.cc:929-1115`
+Source: [`enc_adaptive_quantization.cc:929-1115`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.cc#L929-L1115)
 
 ## Speed Tier Gating
 
@@ -114,7 +114,7 @@ edge artifacts dominating the score.
 Tiles are aligned to AC strategy blocks — a DCT32×32 block produces a single
 tile covering 32×32 pixels.
 
-Source: `enc_adaptive_quantization.cc:768-833`
+Source: [`enc_adaptive_quantization.cc:768-833`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.cc#L768-L833)
 
 ## Per-Iteration Adjustment
 

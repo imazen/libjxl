@@ -31,8 +31,8 @@ driven by a learned decision tree. In VarDCT mode it handles DC coefficients,
 AC metadata, and quantization tables; in full modular mode it encodes the
 entire frame.
 
-Source: `modular/modular_image.h`, `modular/options.h`,
-`modular/transform/transform.h`, `modular/encoding/enc_encoding.h`,
+Source: [`modular/modular_image.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/modular_image.h), [`modular/options.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/options.h),
+[`modular/transform/transform.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/transform.h), [`modular/encoding/enc_encoding.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/encoding/enc_encoding.h),
 `enc_modular.cc`
 
 ## When Modular vs VarDCT

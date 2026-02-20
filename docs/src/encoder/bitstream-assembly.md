@@ -17,7 +17,7 @@ The final stage of encoding assembles all encoded sections into the JPEG XL
 codestream format. Two modes exist: one-shot (entire frame in memory) and
 streaming (sections written incrementally).
 
-Source: `enc_frame.cc`, `enc_toc.h`, `enc_toc.cc`, `toc.h`
+Source: [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc), [`enc_toc.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_toc.h), [`enc_toc.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_toc.cc), [`toc.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/toc.h)
 
 ## TOC (Table of Contents)
 
@@ -48,7 +48,7 @@ Four size buckets with progressive offsets — small sections are cheap to signa
 
 ## One-Shot Assembly
 
-`EncodeFrameOneShot` (`enc_frame.cc:2152`):
+`EncodeFrameOneShot` ([`enc_frame.cc:2152`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L2152)):
 
 1. Prepend special frames (DC frames for progressive DC)
 2. Write frame header via `WriteFrameHeader`
@@ -58,7 +58,7 @@ Four size buckets with progressive offsets — small sections are cheap to signa
 
 ## Group Permutation (Center-First)
 
-When `cparams.centerfirst` is set, `PermuteGroups` (`enc_frame.cc:1688`)
+When `cparams.centerfirst` is set, `PermuteGroups` ([`enc_frame.cc:1688`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L1688))
 reorders AC groups by distance from image center (or specified coordinates):
 
 - DC global and DC groups: unchanged (identity permutation)
@@ -70,7 +70,7 @@ progressive rendering of photographs where the subject is typically centered.
 
 ## Streaming Assembly
 
-`EncodeFrameStreaming` (`enc_frame.cc:2031`) processes one DC group at a time:
+`EncodeFrameStreaming` ([`enc_frame.cc:2031`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc#L2031)) processes one DC group at a time:
 
 ### Permutation
 

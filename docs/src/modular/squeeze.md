@@ -18,8 +18,8 @@ smoothness-aware tendency correction. It decomposes each channel into
 progressive resolution levels, enabling coarse-to-fine decoding and
 decorrelating spatial redundancy.
 
-Source: `modular/transform/enc_squeeze.h`, `modular/transform/enc_squeeze.cc`,
-`modular/transform/squeeze.cc`, `modular/transform/squeeze_params.h`
+Source: [`modular/transform/enc_squeeze.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_squeeze.h), [`modular/transform/enc_squeeze.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_squeeze.cc),
+[`modular/transform/squeeze.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/squeeze.cc), [`modular/transform/squeeze_params.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/squeeze_params.h)
 
 ## Horizontal Squeeze
 

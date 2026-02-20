@@ -17,8 +17,8 @@ that places zero-heavy coefficient positions later in the sequence, improving
 entropy coding through better run-length clustering and earlier end-of-block
 symbols.
 
-Source: `coeff_order.h`, `coeff_order.cc`, `enc_coeff_order.h`,
-`enc_coeff_order.cc`, `lehmer_code.h`
+Source: [`coeff_order.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/coeff_order.h), [`coeff_order.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/coeff_order.cc), [`enc_coeff_order.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_coeff_order.h),
+[`enc_coeff_order.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_coeff_order.cc), [`lehmer_code.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/lehmer_code.h)
 
 ## Order Buckets
 
@@ -59,7 +59,7 @@ order adapts to the rectangular frequency grid.
 
 ## Order Optimization
 
-`ComputeCoeffOrder` (`enc_coeff_order.cc:66`) computes a custom scan order by
+`ComputeCoeffOrder` ([`enc_coeff_order.cc:66`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_coeff_order.cc#L66)) computes a custom scan order by
 sorting coefficient positions by their zero count.
 
 ### Algorithm
@@ -106,13 +106,13 @@ permutation itself.
 Permutations are encoded as Lehmer codes using a Fenwick tree for O(N log N)
 complexity.
 
-### Encoding (`ComputeLehmerCode`, `lehmer_code.h:31`)
+### Encoding (`ComputeLehmerCode`, [[`lehmer_code.h:31`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/lehmer_code.h#L31)](https://github.com/libjxl/libjxl/blob/main/lib/jxl/lehmer_code.h#L31))
 
 For each position i, the Lehmer code value is the number of elements smaller
 than `permutation[i]` that appear after position i. A Fenwick tree tracks
 used elements, and prefix sums compute the count in O(log N) per element.
 
-### Decoding (`DecodeLehmerCode`, `lehmer_code.h:61`)
+### Decoding (`DecodeLehmerCode`, [[`lehmer_code.h:61`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/lehmer_code.h#L61)](https://github.com/libjxl/libjxl/blob/main/lib/jxl/lehmer_code.h#L61))
 
 Reverses the encoding using binary search on Fenwick tree prefix sums to find
 the k-th unused element. O(N log² N) total.

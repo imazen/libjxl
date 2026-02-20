@@ -21,8 +21,8 @@ icons) on flat backgrounds. The encoder detects these elements, encodes them
 as a dictionary of reusable patterns in a reference frame, and subtracts them
 from the main image before VarDCT encoding.
 
-Source: `dec_patch_dictionary.h`, `enc_patch_dictionary.h`,
-`enc_patch_dictionary.cc`
+Source: [`dec_patch_dictionary.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_patch_dictionary.h), [`enc_patch_dictionary.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_patch_dictionary.h),
+[`enc_patch_dictionary.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_patch_dictionary.cc)
 
 ## Screenshot Detection
 

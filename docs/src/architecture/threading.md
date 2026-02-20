@@ -16,8 +16,8 @@ libjxl uses a pluggable threading interface that separates threading policy from
 the codec. The encoder and decoder express parallelism through a `RunOnPool`
 pattern — specify a range of task IDs and a function to call per task.
 
-Source: `base/data_parallel.h`, `include/jxl/parallel_runner.h`,
-`threads/thread_parallel_runner_internal.h`
+Source: [`base/data_parallel.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/base/data_parallel.h), [`include/jxl/parallel_runner.h`](https://github.com/libjxl/libjxl/blob/main/lib/include/jxl/parallel_runner.h),
+[`threads/thread_parallel_runner_internal.h`](https://github.com/libjxl/libjxl/blob/main/lib/threads/thread_parallel_runner_internal.h)
 
 ## JxlParallelRunner Interface
 
@@ -139,7 +139,7 @@ RunOnPool(pool_, 0, ac_group_sec.size(),
 
 ## ThreadParallelRunner
 
-The default runner implementation (`thread_parallel_runner_internal.cc`) uses a
+The default runner implementation ([`thread_parallel_runner_internal.cc`](https://github.com/libjxl/libjxl/blob/main/lib/threads/thread_parallel_runner_internal.cc)) uses a
 fork-join model with persistent worker threads:
 
 ### Lifecycle

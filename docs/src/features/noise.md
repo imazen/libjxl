@@ -25,7 +25,7 @@ image, encodes them as an 8-point intensity-to-noise lookup table, and
 re-synthesizes matching noise at the decoder. This preserves the perceived
 texture of the original without wasting bits encoding actual noise.
 
-Source: `noise.h`, `enc_noise.h`, `enc_noise.cc`, `enc_optimize.h`
+Source: [`noise.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/noise.h), [`enc_noise.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_noise.h), [`enc_noise.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_noise.cc), [`enc_optimize.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_optimize.h)
 
 ## NoiseParams
 

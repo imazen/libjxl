@@ -27,8 +27,8 @@ processes the LfFrame first, making DC data available before the main frame's
 AC coefficients arrive. This enables progressive rendering and can improve
 compression by encoding the slowly-varying DC signal with a specialized path.
 
-Source: `frame_header.h`, `enc_frame.cc`, `enc_cache.cc`, `passes_state.cc`,
-`dec_frame.cc`
+Source: [`frame_header.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/frame_header.h), [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc), [`enc_cache.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_cache.cc), [`passes_state.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/passes_state.cc),
+[`dec_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_frame.cc)
 
 ## Frame Types
 

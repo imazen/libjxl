@@ -31,7 +31,7 @@ convolution) and **EPF** (an adaptive edge-preserving filter with 1–3 stages).
 The encoder applies an approximate inverse Gaborish before quantization so the
 full encode-decode system preserves the original signal more faithfully.
 
-Source: `enc_gaborish.cc`, `stage_gaborish.cc`, `stage_epf.cc`, `epf.cc`, `loop_filter.h/cc`
+Source: [`enc_gaborish.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_gaborish.cc), [`stage_gaborish.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_gaborish.cc), [`stage_epf.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_epf.cc), [`epf.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/epf.cc), [`loop_filter.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/loop_filter.h), [`loop_filter.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/loop_filter.cc)
 
 ## Gaborish: Fixed 3×3 Smoothing (Decoder Side)
 

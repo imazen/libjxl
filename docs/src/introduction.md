@@ -22,7 +22,7 @@ The book is organized bottom-up. Each section builds on the previous:
 
 ## Conventions
 
-- **Source references** use `file.cc:123` format pointing to the libjxl source tree
+- **Source references** link to the [libjxl source tree](https://github.com/libjxl/libjxl/tree/main/lib/jxl) using `file.cc:123` format
 - **Cost functions** and **decision trees** are called out explicitly — these are the core of encoder intelligence
 - **Constants** are copied verbatim from source with their variable names
 - **Mermaid diagrams** show data flow and decision logic

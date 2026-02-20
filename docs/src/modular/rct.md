@@ -24,8 +24,8 @@ The Reversible Color Transform decorrelates color channels using lossless
 integer arithmetic. There are 42 configurations: 6 channel permutations × 7
 transforms.
 
-Source: `modular/transform/enc_rct.h`, `modular/transform/enc_rct.cc`,
-`modular/transform/transform.h`
+Source: [`modular/transform/enc_rct.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_rct.h), [`modular/transform/enc_rct.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/enc_rct.cc),
+[`modular/transform/transform.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/modular/transform/transform.h)
 
 ## Configuration Space
 

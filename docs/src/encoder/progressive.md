@@ -16,7 +16,7 @@ decoders to render increasingly detailed previews as data arrives. JPEG XL
 supports both frequency-based progressive (keeping more coefficients per pass)
 and quality-based progressive (refining quantization).
 
-Source: `enc_progressive_split.h`, `enc_progressive_split.cc`, `enc_frame.cc`
+Source: [`enc_progressive_split.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_progressive_split.h), [`enc_progressive_split.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_progressive_split.cc), [`enc_frame.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_frame.cc)
 
 ## Pass Definitions
 
@@ -60,7 +60,7 @@ All coefficients, no shift. Non-progressive.
 
 ## Coefficient Splitting
 
-`SplitACCoefficients` (`enc_progressive_split.cc:21`) assigns each coefficient
+`SplitACCoefficients` ([`enc_progressive_split.cc:21`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_progressive_split.cc#L21)) assigns each coefficient
 to its pass:
 
 ```

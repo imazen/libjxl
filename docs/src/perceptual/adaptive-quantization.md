@@ -24,7 +24,7 @@ regions, blue-dominant content) and fewer bits to areas where the eye is less
 sensitive (high-frequency textures, bright highlights). It is one of the
 primary drivers of compression efficiency.
 
-Source: `enc_adaptive_quantization.cc` (1292 lines), `enc_adaptive_quantization.h`
+Source: [`enc_adaptive_quantization.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.cc) (1292 lines), [`enc_adaptive_quantization.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_adaptive_quantization.h)
 
 ## The Masking Pipeline
 

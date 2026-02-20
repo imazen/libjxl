@@ -21,12 +21,12 @@ functions that libjxl knows (sRGB, PQ, HLG) are handled by its own SIMD
 implementations rather than the CMS backend, reducing the CMS to just chromatic
 adaptation on linear data.
 
-Source: `cms/jxl_cms.cc`, `cms/jxl_cms_internal.h`, `cms/color_encoding_cms.h`,
-`color_encoding_internal.h`, `jxl/cms_interface.h`
+Source: [`cms/jxl_cms.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc), [`cms/jxl_cms_internal.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms_internal.h), [`cms/color_encoding_cms.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/color_encoding_cms.h),
+[`color_encoding_internal.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/color_encoding_internal.h), [`jxl/cms_interface.h`](https://github.com/libjxl/libjxl/blob/main/lib/include/jxl/cms_interface.h)
 
 ## Pluggable CMS Interface
 
-The public C API (`cms_interface.h`) defines a callback table:
+The public C API ([`cms_interface.h`](https://github.com/libjxl/libjxl/blob/main/lib/include/jxl/cms_interface.h)) defines a callback table:
 
 ```c
 typedef struct {
@@ -87,7 +87,7 @@ kAbsolute   = 3    Proofing
 
 ## CMS Initialization
 
-`JxlCmsInit` (`jxl_cms.cc:1105`) creates a color transform:
+`JxlCmsInit` ([`jxl_cms.cc:1105`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc#L1105)) creates a color transform:
 
 1. Parse both source and destination ICC profiles
 2. If `c_src.SameColorEncoding(c_dst)` → set `skip_lcms = true`
@@ -106,7 +106,7 @@ chromatic adaptation.
 
 ## Transform Pipeline
 
-`DoColorSpaceTransform` (`jxl_cms.cc:204`) processes each row through five
+`DoColorSpaceTransform` ([`jxl_cms.cc:204`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc#L204)) processes each row through five
 stages:
 
 1. **Preprocess** (`BeforeTransform`): Apply inverse TF via SIMD
@@ -121,7 +121,7 @@ stages:
 
 ## ICC Profile Parsing
 
-`JxlCmsSetFieldsFromICC` (`jxl_cms.cc:954`) extracts structured fields from
+`JxlCmsSetFieldsFromICC` ([`jxl_cms.cc:954`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms.cc#L954)) extracts structured fields from
 an ICC profile:
 
 1. Parse with skcms/LCMS
@@ -135,7 +135,7 @@ an ICC profile:
 
 ## ICC Profile Generation
 
-`MaybeCreateProfile` (`jxl_cms_internal.h:1123`) creates ICC profiles from
+`MaybeCreateProfile` ([`jxl_cms_internal.h:1123`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/cms/jxl_cms_internal.h#L1123)) creates ICC profiles from
 structured color encoding fields:
 
 - **Header**: ICC v4.4 with `"jxl "` CMM tag

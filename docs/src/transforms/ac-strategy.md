@@ -27,7 +27,7 @@ For each region of the image, it chooses which DCT transform size to use — fro
 spatial resolution. The selection is driven entirely by cost functions that estimate
 rate + distortion for each candidate transform.
 
-Source: `enc_ac_strategy.cc` (1200 lines), `enc_ac_strategy.h`, `ac_strategy.h`
+Source: [`enc_ac_strategy.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc) (1200 lines), [`enc_ac_strategy.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.h), [`ac_strategy.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/ac_strategy.h)
 
 ## The 27 Transform Types
 
@@ -70,7 +70,7 @@ struct ACSConfig {
 ## Rate-Distortion Multipliers
 
 Three base multipliers control the rate-distortion balance, set in
-`AcStrategyHeuristics::Init` (`enc_ac_strategy.cc`):
+`AcStrategyHeuristics::Init` ([`enc_ac_strategy.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc)):
 
 ```
 info_loss_multiplier = 1.2        // distortion weight
@@ -95,7 +95,7 @@ favors rate reduction (smaller transforms, more zeros). At low quality, multipli
 
 ## EstimateEntropy: The Core Cost Function
 
-`enc_ac_strategy.cc:364-511` — this is where every transform decision is made.
+[`enc_ac_strategy.cc:364-511`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc#L364-L511) — this is where every transform decision is made.
 
 ### Step 1: Forward Transform
 
@@ -253,7 +253,7 @@ mul8x8 = k8x8mul2 + k8x8mul1 / (butteraugli_target + k8x8base)
 
 ### Phase 1: Best 8×8 Transform
 
-`FindBest8x8Transform` (`enc_ac_strategy.cc:513-613`)
+`FindBest8x8Transform` ([`enc_ac_strategy.cc:513-613`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc#L513-L613))
 
 For each 8×8 block in a 64×64 region:
 1. Evaluate all speed-gated single-block candidates via `EstimateEntropy()`
@@ -263,7 +263,7 @@ For each 8×8 block in a 64×64 region:
 
 ### Phase 2: Hierarchical Merging
 
-`ProcessRectACS` (`enc_ac_strategy.cc:827-1059`)
+`ProcessRectACS` ([`enc_ac_strategy.cc:827-1059`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc#L827-L1059))
 
 Works on a 64×64 block (8×8 in block coordinates):
 
@@ -303,7 +303,7 @@ constituent 8×8 blocks, merge. Otherwise keep the 8×8s.
 
 ### TryMergeAcs: The Merge Decision
 
-`enc_ac_strategy.cc:618-653`
+[`enc_ac_strategy.cc:618-653`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_ac_strategy.cc#L618-L653)
 
 1. Check if any sub-block already has higher priority → abort (prevents overlaps)
 2. Sum current entropy estimates for all sub-blocks

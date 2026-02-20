@@ -20,8 +20,8 @@ output. While this is decoder infrastructure, understanding it is essential
 for encoder development — the encoder's RD loops reconstruct through this
 pipeline to compute distortion.
 
-Source: `render_pipeline/render_pipeline.h`, `render_pipeline/render_pipeline_stage.h`,
-`render_pipeline/simple_render_pipeline.cc`, `render_pipeline/low_memory_render_pipeline.h`
+Source: [`render_pipeline/render_pipeline.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/render_pipeline.h), [`render_pipeline/render_pipeline_stage.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/render_pipeline_stage.h),
+[`render_pipeline/simple_render_pipeline.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/simple_render_pipeline.cc), [`render_pipeline/low_memory_render_pipeline.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/low_memory_render_pipeline.h)
 
 ## Pipeline Construction
 
@@ -53,7 +53,7 @@ From `RenderPipelineChannelMode`:
 
 The stages form a pipeline from internal representation to output pixels:
 
-### XYBStage (`stage_xyb.cc`)
+### XYBStage ([`stage_xyb.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_xyb.cc))
 
 Converts from XYB color space to linear RGB. Operates `kInPlace` on channels
 0-2. The `ProcessRow` loop uses `HWY_FULL(float)`, processing `Lanes(d)` pixels
@@ -61,16 +61,16 @@ per iteration with `LoadU`/`StoreU` and fused multiply-add operations. The
 entire class is defined inside `HWY_NAMESPACE` and dispatched via the
 [Highway SIMD pattern](highway-simd.md).
 
-### GaborishStage (`stage_gaborish.cc`)
+### GaborishStage ([`stage_gaborish.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_gaborish.cc))
 
 Edge-preserving smoothing filter. See [Gaborish](../perceptual/gaborish.md).
 
-### UpsamplingStage (`stage_upsampling.cc`)
+### UpsamplingStage ([`stage_upsampling.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_upsampling.cc))
 
 2x/4x/8x upsampling with `kInOut` mode and shift. Used when the frame header
 specifies downsampled encoding.
 
-### NoiseStage (`stage_noise.cc`)
+### NoiseStage ([`stage_noise.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_noise.cc))
 
 Adds synthesized film grain noise. See [Noise](../features/noise.md).
 
@@ -84,7 +84,7 @@ Transfer function application (linear ↔ display). See
 HDR tone mapping for display adaptation. See
 [Tone Mapping](../color/tone-mapping.md).
 
-### WriteToOutputStage (`stage_write.cc`)
+### WriteToOutputStage ([`stage_write.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/render_pipeline/stage_write.cc))
 
 Terminal stage (`kInput`). Converts float planar data to interleaved integer
 pixels:

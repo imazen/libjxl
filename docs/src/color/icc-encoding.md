@@ -16,7 +16,7 @@ byte from structure-aware models and entropy-codes only the residuals. This
 exploits the rigid ICC specification structure — headers, tag directories, and
 known tag types all have strong predictable patterns.
 
-Source: `enc_icc_codec.cc`, `icc_codec.cc`, `icc_codec_common.cc`
+Source: [`enc_icc_codec.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_icc_codec.cc), [`icc_codec.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/icc_codec.cc), [`icc_codec_common.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/icc_codec_common.cc)
 
 ## Bitstream Location
 
@@ -54,7 +54,7 @@ Bytes 84-87:  "acsp"       (magic number)
 
 Residual for each byte: `residual[i] = icc[i] - predicted[i]`
 
-Source: `icc_codec_common.cc:102-138`
+Source: [`icc_codec_common.cc:102-138`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/icc_codec_common.cc#L102-L138)
 
 ## Phase 2: Tag List Encoding
 
@@ -96,7 +96,7 @@ if size differs:   set kFlagBitSize   (0x80), emit Varint(actual_size)
 
 Correctly predicted values cost zero bits. End of tag list: `0x00` byte.
 
-Source: `enc_icc_codec.cc:153-243`
+Source: [`enc_icc_codec.cc:153-243`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_icc_codec.cc#L153-L243)
 
 ## Phase 3: Content Encoding
 
@@ -146,7 +146,7 @@ The 32-bit floats benefit from byte separation alone.
 **Fallback**: Unrecognized data emits `kCommandInsert` with a varint byte count
 and the raw bytes.
 
-Source: `enc_icc_codec.cc:247-442`
+Source: [`enc_icc_codec.cc:247-442`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_icc_codec.cc#L247-L442)
 
 ## Phase 4: Entropy Coding
 

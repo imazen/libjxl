@@ -17,8 +17,8 @@ JPEG XL supports DCT transforms from 4×4 to 256×256 pixels, plus three special
 transforms (Identity, DCT2×2, AFV). All are implemented with SIMD via Highway,
 using a recursive radix-2 decomposition based on the Perera-Liu algorithm.
 
-Source: `dct-inl.h`, `dct_scales.h`, `dct_block-inl.h`, `transpose-inl.h`,
-`enc_transforms-inl.h`, `dec_transforms-inl.h`
+Source: [`dct-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dct-inl.h), [`dct_scales.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dct_scales.h), [`dct_block-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dct_block-inl.h), [`transpose-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/transpose-inl.h),
+[`enc_transforms-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/enc_transforms-inl.h), [`dec_transforms-inl.h`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_transforms-inl.h)
 
 ## Supported Sizes
 
@@ -198,5 +198,5 @@ All DCT code uses Highway's multi-target compilation:
 3. Each inclusion generates code in a different `HWY_NAMESPACE` (e.g., `N_AVX2`)
 4. `HWY_DYNAMIC_DISPATCH` selects the best target at runtime
 
-Production decoder code (`dec_group.cc`) directly includes the `-inl.h` for
+Production decoder code ([`dec_group.cc`](https://github.com/libjxl/libjxl/blob/main/lib/jxl/dec_group.cc)) directly includes the `-inl.h` for
 full inlining, bypassing the dispatch wrapper.
