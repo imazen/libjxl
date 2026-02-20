@@ -2,24 +2,28 @@
 
 ```mermaid
 flowchart TD
-    ORIG["Original XYB"] --> GINV{"Gaborish enabled?"}
-    GINV -->|yes| SHARP["GaborishInverse<br/>5×5 pre-sharpening"]
-    GINV -->|no| ENC["Encode"]
-    SHARP --> ENC
-    ENC --> DEC["Decode"]
-    DEC --> GAB{"Gaborish enabled?"}
-    GAB -->|yes| SMOOTH["Gaborish 3×3<br/>smoothing"]
-    GAB -->|no| EPF0
-    SMOOTH --> EPF0{"epf_iters ≥ 3?"}
-    EPF0 -->|yes| E0["EPF0: 7×7 effective<br/>σ × 0.9 × 1.65"]
-    EPF0 -->|no| EPF1
-    E0 --> EPF1{"epf_iters ≥ 1?"}
-    EPF1 -->|yes| E1["EPF1: 5×5 effective<br/>σ × 1.65"]
-    EPF1 -->|no| OUT["Output"]
-    E1 --> EPF2{"epf_iters ≥ 2?"}
-    EPF2 -->|yes| E2["EPF2: 3×3 effective<br/>σ × 6.5 × 1.65"]
-    EPF2 -->|no| OUT
-    E2 --> OUT
+    subgraph "Encoder Side"
+        ORIG["Original XYB"] --> GINV{"Gaborish enabled?<br/>(≤Hare (5), dist>0.5)"}
+        GINV -->|Yes| SHARP["GaborishInverse<br/>5×5 pre-sharpening"]
+        GINV -->|No| ENC["Encode (DCT + quantize)"]
+        SHARP --> ENC
+    end
+    subgraph "Decoder Side"
+        ENC --> DEC["Decode (dequant + IDCT)"]
+        DEC --> GAB{"Gaborish enabled?"}
+        GAB -->|Yes| SMOOTH["Gaborish 3×3 smoothing"]
+        GAB -->|No| EPF_GATE
+        SMOOTH --> EPF_GATE{"EPF iterations?<br/>(from distance)"}
+    end
+    subgraph "EPF Stages (conditional)"
+        EPF_GATE -->|"0 (dist<0.7)"| OUT["Output"]
+        EPF_GATE -->|"1 (0.7≤dist<1.5)"| E1["EPF1: 5×5 effective<br/>σ × 1.65"]
+        EPF_GATE -->|"2 (1.5≤dist<4.0)"| E1_2["EPF1"] --> E2_2["EPF2: 3×3 effective<br/>σ × 6.5 × 1.65"]
+        EPF_GATE -->|"3 (dist≥4.0)"| E0["EPF0: 7×7 effective<br/>σ × 0.9 × 1.65"] --> E1_3["EPF1"] --> E2_3["EPF2"]
+        E1 --> OUT
+        E2_2 --> OUT
+        E2_3 --> OUT
+    end
 ```
 
 Two decoder-side filters applied after IDCT: **Gaborish** (a fixed 3×3 smoothing

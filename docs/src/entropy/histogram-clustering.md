@@ -7,11 +7,16 @@ each original context to a cluster.
 
 ```mermaid
 graph TD
-    A[N per-context histograms] --> B["Phase 1: Farthest-point seeding"]
-    B --> C[K initial clusters]
-    C --> D["Phase 2: Greedy merge (kBest only)"]
-    D --> E["K' ≤ K merged clusters"]
-    E --> F[Context map + clustered histograms]
+    A["N per-context histograms"] --> B["Phase 1: Farthest-point seeding<br/>(k-means++ variant)"]
+    B --> C["K initial clusters"]
+    C --> D["Phase 2: Priority-queue merge"]
+    D --> BEST["Pop best merge pair<br/>(lowest JS distance)"]
+    BEST --> VALID{"Both clusters<br/>still current?"}
+    VALID -->|"No (stale)"| D
+    VALID -->|Yes| MERGE["Merge: combine histograms<br/>update context map"]
+    MERGE --> MORE{"Beneficial merges<br/>remain?"}
+    MORE -->|Yes| D
+    MORE -->|No| F["K' ≤ K merged clusters<br/>+ context map"]
 ```
 
 ## Source Files

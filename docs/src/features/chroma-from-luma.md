@@ -7,8 +7,15 @@ flowchart TD
     DCT --> AC["Weight AC coefficients<br/>by inv_dequant_matrix × 128"]
     AC --> OPT_X["FindBestMultiplier<br/>X-from-Y (base=0)"]
     AC --> OPT_B["FindBestMultiplier<br/>B-from-Y (base=1.0)"]
-    OPT_X --> SHRINK["Towards-zero shrinkage<br/>threshold = 2.6"]
-    OPT_B --> SHRINK
+    subgraph "Newton Loop (up to 20 iters)"
+        OPT_X --> COST["Evaluate CFLFunction cost<br/>(|v|+1)²−1 smoothed"]
+        OPT_B --> COST
+        COST --> DERIV["Numerical 2nd derivative<br/>(eps=100)"]
+        DERIV --> STEP["Newton step × 0.85"]
+        STEP --> CONV{"|step| < 3e-3?"}
+        CONV -->|No| COST
+    end
+    CONV -->|Yes| SHRINK["Towards-zero shrinkage<br/>threshold = 2.6"]
     SHRINK --> ROUND["Round + clamp<br/>to int8 [-128,127]"]
     ROUND --> MAP["ytox_map / ytob_map<br/>per-tile CfL factors"]
 ```

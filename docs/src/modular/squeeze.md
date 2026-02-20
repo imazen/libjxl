@@ -2,13 +2,15 @@
 
 ```mermaid
 flowchart TD
-    CH["Full-resolution channel<br/>W × H"] --> HSQZ["Horizontal squeeze"]
+    CH["Full-resolution channel<br/>W × H"] --> CHECK{"min dimension > 8?"}
+    CHECK -->|Yes| HSQZ["Horizontal squeeze"]
     HSQZ --> AVG_H["Averages: W/2 × H<br/>(low-pass)"]
-    HSQZ --> RES_H["Residuals: W/2 × H<br/>(high-pass)"]
+    HSQZ --> RES_H["Residuals: W/2 × H<br/>(high-pass, stored)"]
     AVG_H --> VSQZ["Vertical squeeze"]
     VSQZ --> AVG_HV["Averages: W/2 × H/2<br/>(LL band)"]
-    VSQZ --> RES_V["Residuals: W/2 × H/2<br/>(LH band)"]
-    RES_H --> NEXT["Continue until<br/>min dimension ≤ 8"]
+    VSQZ --> RES_V["Residuals: W/2 × H/2<br/>(LH band, stored)"]
+    AVG_HV -->|"next level"| CHECK
+    CHECK -->|No| DONE["Encode: LL band first<br/>then residuals coarse→fine"]
 ```
 
 Squeeze implements a modified Haar wavelet decomposition with a

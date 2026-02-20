@@ -2,11 +2,23 @@
 
 ```mermaid
 graph TD
-    XYB["XYB Pixels + Quant Field + Mask"] --> P1["Phase 1: Best 8×8 per block<br/>(10 candidates)"]
-    P1 --> P2R["Phase 2: Try rectangular merges<br/>(16×8, 16×32, 64×32)"]
-    P2R --> P2S["Phase 2: Try square merges<br/>(16×16, 32×32, 64×64)"]
-    P2S --> P3["Phase 3: Non-aligned merges<br/>(16×16, 32×32 at odd offsets)"]
-    P3 --> ACS["AcStrategyImage<br/>per-block transform type"]
+    XYB["XYB Pixels + Quant Field + Mask"] --> P1["Phase 1: Score 10 candidates<br/>per 8×8 block"]
+    P1 --> P1D{"Best candidate<br/>< 8×8 cost?"}
+    P1D -->|Yes| P1A["Accept: use best<br/>(DCT4, IDENTITY, etc.)"]
+    P1D -->|No| P1B["Keep DCT8×8"]
+    P1A --> P2R
+    P1B --> P2R
+    P2R["Phase 2R: Try rectangular merges<br/>(16×8, 16×32, 64×32)"] --> P2RD{"Merged cost<br/>< sum of parts?"}
+    P2RD -->|Yes| P2RA["Accept merge"]
+    P2RD -->|No| P2RK["Keep smaller blocks"]
+    P2RA --> P2S
+    P2RK --> P2S
+    P2S["Phase 2S: Try square merges<br/>(16×16, 32×32, 64×64)"] --> P2SD{"Merged cost<br/>< sum of parts?"}
+    P2SD -->|Yes| P2SA["Accept merge"]
+    P2SD -->|No| P2SK["Keep smaller blocks"]
+    P2SA --> P3
+    P2SK --> P3
+    P3["Phase 3: Non-aligned merges<br/>(≤Kitten (2): 16×16, 32×32<br/>at odd offsets)"] --> ACS["AcStrategyImage<br/>per-block transform type"]
 ```
 
 AC strategy selection is the encoder's single most consequential rate-distortion decision.

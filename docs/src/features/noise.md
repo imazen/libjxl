@@ -10,8 +10,14 @@ flowchart TD
     THR -->|Yes| FLAT["Select flat blocks<br/>(SAD ≤ threshold)"]
     FLAT --> LAP["Laplacian filter<br/>measure noise level"]
     LAP --> OBS["(intensity, noise_level)<br/>observations"]
-    OBS --> FIT["SCG optimization<br/>8-point LUT fit"]
-    FIT --> LUT["NoiseParams LUT<br/>8 × 10-bit values"]
+    subgraph "SCG Optimization (≤40 iters)"
+        OBS --> INIT["Initialize 8-point LUT"]
+        INIT --> GRAD["Compute gradient<br/>+ asymmetric loss (1.1×)"]
+        GRAD --> UPDATE["Conjugate gradient step"]
+        UPDATE --> CONV{"|change| < 1e-8?"}
+        CONV -->|No| GRAD
+    end
+    CONV -->|Yes| LUT["NoiseParams LUT<br/>8 × 10-bit values"]
 ```
 
 Noise synthesis estimates the film/photon noise characteristics of the source

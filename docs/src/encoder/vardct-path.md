@@ -2,22 +2,38 @@
 
 ```mermaid
 graph TD
-    XYB["XYB image"] --> SP["Find/subtract splines<br/>(≤Squirrel (3))"]
-    SP --> PA["Find/subtract patches<br/>(≤Squirrel (3))"]
-    PA --> IQ["Initial quant field<br/>(≤Hare (5): butteraugli masking)"]
-    IQ --> GS["Global scale<br/>ComputeGlobalScaleAndQuant"]
-    GS --> GAB["Gaborish inverse<br/>(if enabled)"]
-    GAB --> TILE["Per 64×64 tile"]
-    TILE --> CFL1["CfL pass 1<br/>(≤Squirrel (3), no strategy)"]
-    CFL1 --> ACS["AC strategy selection<br/>EstimateEntropy cost"]
-    ACS --> AQF["AdjustQuantField<br/>by AC strategy"]
-    AQF --> CFL2["CfL pass 2<br/>(≤Hare (5), with strategy)"]
-    CFL2 --> FBQ["FindBestQuantizer<br/>butteraugli RD loop<br/>(≤Kitten (2), 2-4 iters)"]
-    FBQ --> BCM["Block context model<br/>(<Falcon (7))"]
-    BCM --> IPE["InitializePassesEncoder"]
-    IPE --> CC["ComputeCoefficients<br/>DCT + quantize per group"]
-    CC --> AR["ComputeARHeuristics<br/>EPF sharpness (≤Wombat (4))"]
-    AR --> TOK["TokenizeAllCoefficients"]
+    subgraph "Feature Detection (≤Squirrel (3))"
+        XYB["XYB image"] --> SP["Find/subtract splines"]
+        SP --> PA["Find/subtract patches"]
+    end
+    subgraph "Quantization Setup"
+        PA --> IQ["Initial quant field<br/>(≤Hare (5): butteraugli masking)"]
+        IQ --> GS["Global scale<br/>ComputeGlobalScaleAndQuant"]
+        GS --> GAB["Gaborish inverse<br/>(if enabled)"]
+    end
+    subgraph "Per 64×64 Tile (parallel)"
+        GAB --> CFL1["CfL pass 1<br/>(≤Squirrel (3))"]
+        CFL1 --> ACS["AC strategy selection"]
+        ACS --> AQF["AdjustQuantField"]
+        AQF --> CFL2["CfL pass 2<br/>(≤Hare (5))"]
+    end
+    subgraph "Butteraugli RD Loop (≤Kitten (2))"
+        CFL2 --> FBQ_ENC["Encode: DCT + quantize"]
+        FBQ_ENC --> FBQ_DEC["Decode: IDCT + filters"]
+        FBQ_DEC --> FBQ_BA["Butteraugli distortion"]
+        FBQ_BA --> FBQ_ADJ["Adjust quant_field"]
+        FBQ_ADJ -->|"2-5 iterations"| FBQ_ENC
+    end
+    subgraph "Finalize"
+        FBQ_ADJ --> BCM["Block context model<br/>(<Falcon (7))"]
+        BCM --> CC["ComputeCoefficients<br/>DCT + quantize per group"]
+    end
+    subgraph "AR Feedback (≤Wombat (4))"
+        CC --> AR_RECON["Reconstruct per<br/>sharpness candidate"]
+        AR_RECON --> AR_ERR["Masked L2 error"]
+        AR_ERR --> AR_PICK["Pick best sharpness"]
+    end
+    AR_PICK --> TOK["TokenizeAllCoefficients"]
 ```
 
 The VarDCT path is the **lossy photographic** encoding pipeline — it is NOT
