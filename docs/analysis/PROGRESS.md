@@ -1,18 +1,18 @@
 # Analysis Progress
 
 ## Phase 1: Foundations
-- [ ] 01-base-primitives (status.h, common.h, span.h, bits.h)
-- [ ] 02-memory-model (image.h, Plane<T>, alignment)
-- [ ] 03-serialization (fields.h, Visitor pattern, Bundle)
-- [ ] 04-bit-io (BitReader, BitWriter, PaddedBytes)
+- [x] 01-base-primitives (status.h, common.h, span.h, bits.h)
+- [x] 02-memory-model (image.h, Plane<T>, alignment)
+- [x] 03-serialization (fields.h, Visitor pattern, Bundle)
+- [x] 04-bit-io (BitReader, BitWriter, PaddedBytes)
 
 ## Phase 2: Entropy Coding
-- [ ] 05-ans-common (ans_common.h, alias tables)
-- [ ] 06-ans-encoder (enc_ans.cc, symbol writing)
-- [ ] 07-hybrid-integers (HybridUintConfig, split-exponent)
-- [ ] 08-histogram-clustering (enc_cluster, distance metrics)
-- [ ] 09-lz77 (enc_lz77, back-references)
-- [ ] 10-context-modeling (context maps, block context)
+- [x] 05-ans-entropy (ans_common/params/enc_ans/dec_ans, alias tables, hybrid integers, encoding/decoding)
+- [ ] 06-ans-encoder (MERGED into 05)
+- [ ] 07-hybrid-integers (MERGED into 05)
+- [x] 08-histogram-clustering (enc_cluster, context maps, LZ77, block context)
+- [ ] 09-lz77 (MERGED into 08)
+- [ ] 10-context-modeling (MERGED into 08)
 
 ## Phase 3: Color Science
 - [ ] 11-xyb-color-space (opsin absorbance, XYB encoding)
@@ -22,13 +22,13 @@
 
 ## Phase 4: Transforms + Quantization
 - [ ] 15-dct-family (DCT-II/III, sizes, SIMD)
-- [ ] 16-ac-strategy (block size selection heuristics, COST FUNCTIONS)
+- [x] 16-ac-strategy (block size selection heuristics, COST FUNCTIONS)
 - [ ] 17-coefficient-order (scan order optimization)
 - [ ] 18-quantization (quant matrices, DC/AC quantization, MULTIPLIERS)
 
 ## Phase 5: Perceptual Models
 - [ ] 19-butteraugli (perceptual distance metric)
-- [ ] 20-adaptive-quantization (AQ masking, DECISION TREES, COST ANALYSIS)
+- [x] 20-adaptive-quantization (AQ masking, DECISION TREES, COST ANALYSIS)
 - [ ] 21-gaborish (edge enhancement filter)
 
 ## Phase 6: Modular Path
