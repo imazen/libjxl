@@ -194,7 +194,25 @@ At low quality (target > 14.0): `dampen = 0.0`, flat `base_level` everywhere
 ## Butteraugli Feedback Loop (FindBestQuantization)
 
 For speed ≤ Kitten, the initial AQ map is refined through iterative
-encode-decode-compare cycles:
+encode-decode-compare cycles. This is the encoder's most important quality
+mechanism — it closes the loop between the perceptual model and actual
+encoder output.
+
+```mermaid
+graph TD
+    INIT["Initial quant_field<br/>(from masking pipeline)"] --> ITER["Start iteration i"]
+    ITER --> ENCODE["Forward pass:<br/>DCT → quantize → dequantize"]
+    ENCODE --> DECODE["Inverse pass:<br/>IDCT → Gaborish → EPF"]
+    DECODE --> BUTTER["Butteraugli:<br/>compute pixel-level<br/>distortion map"]
+    BUTTER --> TILE["TileDistMap:<br/>16th-norm per-block<br/>aggregation"]
+    TILE --> ADJ{"Per-block:<br/>tile_dist vs target?"}
+    ADJ -->|"Over target"| INC["quant *= diff<br/>(more bits)"]
+    ADJ -->|"Under target<br/>(iters 0-1 only)"| DEC["quant *= pow(diff, 0.2)<br/>(fewer bits)"]
+    INC --> NEXT{"i < max_iters?"}
+    DEC --> NEXT
+    NEXT -->|Yes| ITER
+    NEXT -->|No| DONE["Final quant_field"]
+```
 
 ```
 Default: 2 iterations (kDefaultButteraugliIters)

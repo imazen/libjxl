@@ -100,6 +100,49 @@ prediction pipeline.
 See [Group Encoding](group-encoding.md) and
 [Bitstream Assembly](bitstream-assembly.md).
 
+## Feedback Loops
+
+The encoder's quality depends heavily on feedback loops that verify encoding
+decisions against actual decoder output. These are the most expensive — and
+most impactful — parts of the pipeline.
+
+```mermaid
+graph LR
+    subgraph "Butteraugli RD Loop (≤Kitten)"
+        A1["Quantize"] --> A2["Dequant + IDCT<br/>+ Gaborish + EPF"]
+        A2 --> A3["Butteraugli<br/>distortion"]
+        A3 --> A4["Adjust<br/>quant_field"]
+        A4 -->|"2-5 iters"| A1
+    end
+
+    subgraph "AR Heuristics (≤Wombat)"
+        B1["Set sharpness<br/>candidate"] --> B2["Full reconstruct<br/>per candidate"]
+        B2 --> B3["Masked L2<br/>error"]
+        B3 --> B4["Pick best<br/>sharpness"]
+    end
+
+    subgraph "CfL Two-Pass"
+        C1["CfL pass 1<br/>(before ACS)"] --> C2["AC strategy<br/>selection"]
+        C2 --> C3["CfL pass 2<br/>(with ACS + quant)"]
+    end
+
+    subgraph "Block Context Model (<Falcon)"
+        D1["Quantize +<br/>tokenize"] --> D2["Cluster (QF, ACS)<br/>pairs"]
+        D2 --> D3["Re-tokenize with<br/>new contexts"]
+    end
+```
+
+| Loop | Speed Gate | Iterations | What It Verifies |
+|------|-----------|------------|------------------|
+| **Butteraugli RD** | ≤ Kitten | 2–5 | Quantization field matches perceptual target |
+| **AR sharpness** | ≤ Wombat | 1 per candidate (2-3 candidates) | EPF settings minimize reconstruction error |
+| **CfL two-pass** | Pass 1: ≤ Squirrel, Pass 2: ≤ Hare | 2 total | CfL correlations account for actual block sizes |
+| **Block context** | < Falcon | 1 | Entropy contexts match actual QF/ACS distribution |
+
+Without these loops, the encoder relies entirely on feed-forward heuristics
+(masking models, cost estimates). The butteraugli RD loop alone accounts for
+most of the quality difference between Squirrel (3) and Kitten (2) speed tiers.
+
 ## Speed Tier Feature Map
 
 ```

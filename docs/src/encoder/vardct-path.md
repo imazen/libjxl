@@ -86,17 +86,45 @@ Hare and slower.
 
 ### Step 6: Quantizer Refinement (speed ≤ Kitten)
 
-`FindBestQuantizer` runs the butteraugli RD loop:
+`FindBestQuantizer` runs the butteraugli RD loop — the encoder's central
+feedback mechanism where it actually measures what the decoder will produce
+and adjusts accordingly:
 
-| Speed | Iterations |
-|-------|-----------|
-| Tortoise or slower | 5 total |
-| Kitten | 3 total |
-| Squirrel+ | 0 (no RD loop) |
+```mermaid
+graph TD
+    QF["Initial quant_field<br/>(from AQ masking)"] --> ENC["Encode: DCT + quantize<br/>+ dequantize (roundtrip)"]
+    ENC --> DEC["Decode: IDCT + Gaborish<br/>+ EPF reconstruction"]
+    DEC --> BA["Butteraugli: compute<br/>per-pixel distortion map"]
+    BA --> TILE["TileDistMap: aggregate<br/>per-block (16th-norm)"]
+    TILE --> CMP{"tile_dist vs<br/>target?"}
+    CMP -->|"Over target"| UP["Increase quant_field<br/>quant *= diff"]
+    CMP -->|"Under target"| DOWN["Gently decrease<br/>quant *= pow(diff, 0.2)"]
+    UP --> MORE{"More iterations?"}
+    DOWN --> MORE
+    MORE -->|Yes| ENC
+    MORE -->|No| FINAL["Final quant_field"]
+```
 
-Each iteration: encode → decode → compute butteraugli distortion → adjust
-quant field where distortion exceeds/undershoots target. See
-[Adaptive Quantization](../perceptual/adaptive-quantization.md).
+| Speed | Iterations | Notes |
+|-------|-----------|-------|
+| Tortoise or slower | 5 total | Also uses `FindBestQuantizationHQ` with max-error targeting |
+| Kitten | 3 total | Standard RD loop |
+| Squirrel+ | 0 | No RD loop — initial AQ map used as-is |
+
+This is the single largest quality gap between fast and slow encoding. Without
+the feedback loop, the encoder is guessing quantization from masking heuristics
+alone. With it, the encoder verifies every decision against the actual
+perceptual model.
+
+**Per-iteration behavior changes:**
+- **Iterations 0–1**: Increase quant aggressively where distortion exceeds
+  target, decrease gently (exponent 0.2) where under target. Iteration 1
+  clamps: `quant = max(quant, 0.4*quant + 0.6*initial)` to prevent oscillation.
+- **Iterations 2+**: Only increase quant where distortion exceeds target. No
+  quality improvement — just fix remaining hot spots.
+
+See [Adaptive Quantization](../perceptual/adaptive-quantization.md) for the
+full TileDistMap aggregation and per-iteration formulas.
 
 ### Step 7: Block Context Model (speed < Falcon)
 
@@ -129,14 +157,24 @@ Per-block AC quantization refinement:
 - Reduces quant in high-activity areas (preserves texture)
 - Adjusts dead-zone thresholds per quadrant
 
-## AR Heuristics (speed ≤ Wombat)
+## AR Heuristics Feedback Loop (speed ≤ Wombat)
 
-`ComputeARHeuristics` optimizes per-block EPF sharpness values (0-7):
+`ComputeARHeuristics` is another encode-decode-compare feedback loop, this
+time optimizing per-block EPF sharpness values (0-7):
 
-1. Define candidates: `{0, 2, 7}` for distance ≤ 4.5, or `{0, 4}` higher
-2. Full reconstruct per candidate → per-block masked L2 error vs original
-3. Pick lowest-error candidate, bias toward 0 (`kFavorNoSmoothing = 0.99`)
-4. Second pass: refine using context-dependent entropy cost
+```mermaid
+graph TD
+    CAND["Define candidates:<br/>{0,2,7} if dist≤4.5<br/>{0,4} if dist>4.5"] --> RECON["Full reconstruct per candidate:<br/>dequantize → IDCT → Gaborish → EPF"]
+    RECON --> ERR["Per-block masked L2 error<br/>vs original pixels"]
+    ERR --> PICK["Pick lowest-error candidate<br/>bias toward 0 (×0.99)"]
+    PICK --> REFINE["Second pass: add entropy<br/>cost of sharpness signaling"]
+    REFINE --> SHARP["Final per-block<br/>sharpness map (0-7)"]
+```
+
+This loop runs once per candidate set (not iteratively), but it does a full
+reconstruction for each candidate — making it expensive at 2-3 full decodes
+per image. The bias toward sharpness=0 (`kFavorNoSmoothing = 0.99`)
+means EPF smoothing is only applied when it measurably reduces error.
 
 ## Post-Heuristics
 
