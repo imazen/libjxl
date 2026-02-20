@@ -1206,6 +1206,43 @@ Status LossyFrameHeuristics(const FrameHeader& frame_header,
 
   JXL_RETURN_IF_ERROR(acs_heuristics.Finalize(frame_dim, ac_strategy, aux_out));
 
+  // DIAG: dump ac_strategy and raw_quant_field
+  if (const char* p = getenv("JXL_DUMP_MAPS")) {
+    std::string prefix(p);
+    {
+      FILE* f = fopen((prefix + "_acs.csv").c_str(), "w");
+      if (f) {
+        for (size_t y = 0; y < frame_dim.ysize_blocks; y++) {
+          AcStrategyRow row = ac_strategy.ConstRow(y);
+          for (size_t x = 0; x < frame_dim.xsize_blocks; x++) {
+            if (x) fputc(',', f);
+            fprintf(f, "%u", static_cast<unsigned>(row[x].RawStrategy()));
+          }
+          fputc('\n', f);
+        }
+        fclose(f);
+        fprintf(stderr, "DIAG: wrote %s_acs.csv (%zux%zu)\n", p,
+                frame_dim.xsize_blocks, frame_dim.ysize_blocks);
+      }
+    }
+    {
+      FILE* f = fopen((prefix + "_qf.csv").c_str(), "w");
+      if (f) {
+        for (size_t y = 0; y < frame_dim.ysize_blocks; y++) {
+          const int32_t* row = raw_quant_field.ConstRow(y);
+          for (size_t x = 0; x < frame_dim.xsize_blocks; x++) {
+            if (x) fputc(',', f);
+            fprintf(f, "%d", row[x]);
+          }
+          fputc('\n', f);
+        }
+        fclose(f);
+        fprintf(stderr, "DIAG: wrote %s_qf.csv (%zux%zu)\n", p,
+                frame_dim.xsize_blocks, frame_dim.ysize_blocks);
+      }
+    }
+  }
+
   // Refine quantization levels.
   if (!streaming_mode && !cparams.disable_perceptual_optimizations) {
     ImageB& epf_sharpness = shared.epf_sharpness;
