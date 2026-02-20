@@ -86,7 +86,7 @@ coefficients as independent frames:
 2. DC level 2: DC of DC level 1 at 1/64 resolution
 
 Each DC frame is encoded recursively via `EncodeFrame` at reduced quality.
-Level 0 (smallest) uses modular mode at Tortoise speed.
+Level 0 (smallest) uses modular mode at Tortoise (1) speed.
 
 The frame header flags `kUseDcFrame` when progressive DC data is present.
 

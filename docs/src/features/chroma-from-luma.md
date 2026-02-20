@@ -139,12 +139,12 @@ would give ~1% more compression density.
 
 | Speed | CfL Behavior |
 |-------|-------------|
-| ≤ Squirrel | Two passes: first without AC strategy (seed), second with |
-| Hare | One pass with AC strategy and quant, `fast = true` |
-| Wombat | One pass with AC strategy and quant, `fast = true` |
-| ≥ Cheetah | No per-tile CfL; map stays all-zeros (global base only) |
+| ≤ Squirrel (3) | Two passes: first without AC strategy (seed), second with |
+| Hare (5) | One pass with AC strategy and quant, `fast = true` |
+| Wombat (4) | One pass with AC strategy and quant, `fast = true` |
+| ≥ Cheetah (6) | No per-tile CfL; map stays all-zeros (global base only) |
 
-At speed ≤ Squirrel, CfL is computed twice: once with `use_dct8 = true` (before
+At speed ≤ Squirrel (3), CfL is computed twice: once with `use_dct8 = true` (before
 block size decisions) to provide an initial CfL map for AC strategy selection,
 then again with actual AC strategy and quantization field.
 

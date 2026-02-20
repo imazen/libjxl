@@ -78,5 +78,5 @@ All values entropy-coded with ANS using 6 contexts (`kNumSplineContexts`).
 object. The encoder never automatically detects splines from image content.
 Splines can only be injected programmatically through the API.
 
-Detection is gated on speed ≤ Squirrel in non-streaming mode, but since the
+Detection is gated on speed ≤ Squirrel (3) in non-streaming mode, but since the
 function returns empty, the gate is effectively a no-op.

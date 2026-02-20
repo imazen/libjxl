@@ -285,7 +285,7 @@ else:
 Each rectangle decision is local: if the merged rectangle is cheaper than the
 constituent 8×8 blocks, merge. Otherwise keep the 8×8s.
 
-**Non-aligned merging** (Kitten/Tortoise speeds):
+**Non-aligned merging** (Kitten (2)/Tortoise (1) speeds):
 - Retry 16×16 at non-2-aligned positions
 - Retry 32×32 at non-4-aligned positions
 
@@ -301,8 +301,8 @@ constituent 8×8 blocks, merge. Otherwise keep the 8×8s.
 ## Speed Tier Gating
 
 ```
-Cheetah (≥7): DCT8×8 only (hardcoded, no heuristics)
-Hare (5-6):   Phase 1 only (10 candidates per block, no merging)
+Cheetah (6) (≥7): DCT8×8 only (hardcoded, no heuristics)
+Hare (5) (5-6):   Phase 1 only (10 candidates per block, no merging)
 Wombat (4):   + 16×8/8×16 merge, + 16×32/32×16 merge
 Squirrel (3): + 64×32/32×64 merge
 Kitten (2):   + non-aligned 32×32 merging (step=2)

@@ -104,7 +104,7 @@ Gradient predictor, 34 contexts) to evaluate palette benefit.
 min(cost_before × 0.0005 + nb_pixels/128 + 128, |palette_colors|)
 ```
 
-At speed ≤ Squirrel, transforms are evaluated by comparing estimated cost
+At speed ≤ Squirrel (3), transforms are evaluated by comparing estimated cost
 before and after. If cost increases, the transform is undone. At faster tiers,
 transforms are applied unconditionally.
 

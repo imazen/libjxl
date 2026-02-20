@@ -82,7 +82,7 @@ num_dc_groups = ceil(width/dc_group_dim) × ceil(height/dc_group_dim)
 - Custom: `cparams.modular_group_size_shift`
 
 ### Loop Filter
-- **Gaborish**: enabled when speed ≤ Hare AND VarDCT AND distance > 0.5 AND
+- **Gaborish**: enabled when speed ≤ Hare (5) AND VarDCT AND distance > 0.5 AND
   `decoding_speed_tier < 4` AND perceptual optimizations not disabled
 - **EPF iterations**: based on distance thresholds
 

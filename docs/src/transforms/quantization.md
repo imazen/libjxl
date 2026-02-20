@@ -286,7 +286,7 @@ At low quality (high target): uses mean (avoid over-quantizing large blocks).
 
 ## FindBestQuantization: Butteraugli Feedback Loop
 
-For speed ≤ Kitten, runs 2–4 iterations of encode-decode-compare:
+For speed ≤ Kitten (2), runs 2–4 iterations of encode-decode-compare:
 
 ```
 Iterations 0–1: kPow = 0.2

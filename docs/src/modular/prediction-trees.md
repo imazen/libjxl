@@ -116,11 +116,11 @@ Higher = fewer splits = simpler tree = faster decode.
 
 | Speed | Properties | Max Quantization Values |
 |-------|-----------|----------------------|
-| Hare | 4 | 24 |
-| Wombat | 5 | 32 |
-| Squirrel | 7 | 48 |
-| Kitten | 10 | 96 |
-| Tortoise | All 16 | 256 |
+| Hare (5) | 4 | 24 |
+| Wombat (4) | 5 | 32 |
+| Squirrel (3) | 7 | 48 |
+| Kitten (2) | 10 | 96 |
+| Tortoise (1) | All 16 | 256 |
 
 ### Sample Collection
 
@@ -139,8 +139,8 @@ For non-learned tree kinds:
 | kJpegTranscodeACMeta | Single Zero leaf | JPEG AC metadata |
 | kFalconACMeta | Single Left leaf | Fast AC metadata |
 | kACMeta | 27-node tree on channel/y/left/top | Default AC metadata |
-| kWPFixedDC | Binary tree on WP property, 33 cutoffs | DC at Falcon speed |
-| kGradientFixedDC | Binary tree on gradient, 33 cutoffs | DC at Thunder speed |
+| kWPFixedDC | Binary tree on WP property, 33 cutoffs | DC at Falcon (7) speed |
+| kGradientFixedDC | Binary tree on gradient, 33 cutoffs | DC at Thunder (8) speed |
 
 Fixed trees are reduced for small images: when `log2(pixels) < 14`, a minimum
 gap of `8 × (14 − log_px)` is enforced between cutoff indices.
@@ -149,12 +149,12 @@ gap of `8 × (14 − log_px)` is enforced between cutoff indices.
 
 | Condition | Predictor |
 |-----------|-----------|
-| Lossless + not responsive + ≤ Glacier | Variable (per-pixel via tree) |
+| Lossless + not responsive + ≤ Glacier (0) | Variable (per-pixel via tree) |
 | Responsive or lossy_palette | Zero |
 | Lossy + not responsive | Gradient |
-| Lossless + speed < Falcon | Best (Gradient or Weighted) |
-| Falcon | Weighted |
-| Thunder+ | Gradient |
+| Lossless + speed < Falcon (7) | Best (Gradient or Weighted) |
+| Falcon (7) | Weighted |
+| Thunder (8)+ | Gradient |
 
 ## Fast Paths
 

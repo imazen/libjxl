@@ -121,13 +121,13 @@ ModularGenericCompress(image, opts, writer)
 
 | Feature | Speed Tier |
 |---------|-----------|
-| Variable predictor (per-pixel via tree) | ≤ Glacier |
-| Best-of-19 RCT search | ≤ Tortoise |
-| WP mode search (5 modes) | ≤ Tortoise |
-| Learned MA tree | ≤ Cheetah |
-| Per-group RCT search (4-9 types) | ≤ Hare |
-| Fixed tree (Weighted predictor) | Falcon |
-| Fixed tree (Gradient predictor) | Thunder+ |
+| Variable predictor (per-pixel via tree) | ≤ Glacier (0) |
+| Best-of-19 RCT search | ≤ Tortoise (1) |
+| WP mode search (5 modes) | ≤ Tortoise (1) |
+| Learned MA tree | ≤ Cheetah (6) |
+| Per-group RCT search (4-9 types) | ≤ Hare (5) |
+| Fixed tree (Weighted predictor) | Falcon (7) |
+| Fixed tree (Gradient predictor) | Thunder (8)+ |
 
 ## Key Constants
 

@@ -4,7 +4,7 @@
 flowchart TD
     OPSIN["Opsin image"] --> SCREEN{"Screenshot<br/>detection"}
     SCREEN -->|4×4 flat blocks<br/>8/9 same color| SEED["Background seeds"]
-    SCREEN -->|No flat areas| DOTS["Try dot detection<br/>(d ≥ 3.0, speed ≤ Squirrel)"]
+    SCREEN -->|No flat areas| DOTS["Try dot detection<br/>(d ≥ 3.0, speed ≤ Squirrel (3))"]
     SEED --> BFS["BFS flood-fill<br/>radius 1, distance ≤ 50px"]
     BFS --> BG["Background image<br/>+ is_background mask"]
     BG --> CC["Connected components<br/>of foreground pixels"]
@@ -31,7 +31,7 @@ AND at least 8 of 9 surrounding 4×4 blocks share that color. These "flat
 areas" indicate screenshot content.
 
 If no flat areas found and patches not explicitly forced, the encoder tries
-**dot dictionary** detection instead (enabled at speed ≤ Squirrel,
+**dot dictionary** detection instead (enabled at speed ≤ Squirrel (3),
 distance ≥ 3.0).
 
 ## Patch Extraction
@@ -101,7 +101,7 @@ Patches are entropy-coded using ANS with dedicated contexts for:
 
 ## Activation
 
-Patches are detected at speed ≤ Squirrel in non-streaming VarDCT mode. The
+Patches are detected at speed ≤ Squirrel (3) in non-streaming VarDCT mode. The
 frame header `kPatches` flag is set when patches are present.
 
 Dot dictionary is mutually exclusive with patches — patches take priority.

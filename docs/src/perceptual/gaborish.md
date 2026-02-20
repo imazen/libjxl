@@ -83,7 +83,7 @@ pre-compensating for the decoder's blurring.
 ## Gaborish Activation
 
 Gaborish is enabled when ALL of:
-- `speed_tier ≤ Hare`
+- `speed_tier ≤ Hare (5)`
 - VarDCT encoding
 - `decoding_speed_tier < 4`
 - `butteraugli_distance > 0.5`
@@ -185,7 +185,7 @@ far more precisely than chrominance edges.
 
 ## Encoder-Side Sharpness Optimization
 
-For `distance ≥ 0.5` and `speed ≤ Wombat`, the encoder optimizes per-block
+For `distance ≥ 0.5` and `speed ≤ Wombat (4)`, the encoder optimizes per-block
 EPF sharpness values (0–7 index into `epf_sharp_lut`):
 
 1. Define candidates: `{0, 2, 7}` for distance ≤ 4.5, or `{0, 4}` for higher

@@ -64,7 +64,7 @@ sorting coefficient positions by their zero count.
 
 ### Algorithm
 
-**1. Block sampling**: At speed ≥ kSquirrel with only DCT8 in use, samples 50%
+**1. Block sampling**: At speed ≥ kSquirrel (3) with only DCT8 in use, samples 50%
 of blocks via Xorshift128+ PRNG to reduce work.
 
 **2. Zero counting**: For every sampled block, counts zeros per coefficient
@@ -144,10 +144,10 @@ This means:
 
 | Speed | Custom Orders? | Sampling |
 |-------|---------------|----------|
-| Tortoise–Cheetah | Yes, up to order 6 (≤32×32) | 50% at Squirrel+ if DCT8-only |
-| Falcon+ | No (default only) | N/A |
+| Tortoise (1)–Cheetah (6) | Yes, up to order 6 (≤32×32) | 50% at Squirrel (3)+ if DCT8-only |
+| Falcon (7)+ | No (default only) | N/A |
 
-At speed ≥ kFalcon, `ComputeUsedOrders` returns only DCT8 as "used" with no
+At speed ≥ kFalcon (7), `ComputeUsedOrders` returns only DCT8 as "used" with no
 customization — all blocks use the natural zig-zag order.
 
 Orders with bucket index > 6 (the large transforms: 64×64+) are never

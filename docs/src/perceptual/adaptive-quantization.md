@@ -12,7 +12,7 @@ graph TD
     HF --> BM["BlueModulation<br/>(S-cone compensation)"]
     BM --> EXP["exp2(modulated_value)"]
     EXP --> AQ["Per-block AQ map"]
-    AQ --> LOOP{"Speed ≤ Kitten?"}
+    AQ --> LOOP{"Speed ≤ Kitten (2)?"}
     LOOP -->|yes| FB["Butteraugli Feedback<br/>(2-4 iterations)"]
     LOOP -->|no| OUT["Final quant_field"]
     FB --> OUT
@@ -193,7 +193,7 @@ At low quality (target > 14.0): `dampen = 0.0`, flat `base_level` everywhere
 
 ## Butteraugli Feedback Loop (FindBestQuantization)
 
-For speed ≤ Kitten, the initial AQ map is refined through iterative
+For speed ≤ Kitten (2), the initial AQ map is refined through iterative
 encode-decode-compare cycles. This is the encoder's most important quality
 mechanism — it closes the loop between the perceptual model and actual
 encoder output.
@@ -216,7 +216,7 @@ graph TD
 
 ```
 Default: 2 iterations (kDefaultButteraugliIters)
-Tortoise: 4 iterations (kMaxButteraugliIters)
+Tortoise (1): 4 iterations (kMaxButteraugliIters)
 ```
 
 ### Per-Iteration Logic
@@ -265,12 +265,12 @@ max. Corner/border weighting slightly de-emphasizes tile edges.
 ```
 if max_error_mode:
     → FindBestQuantizationMaxError (per-block max error targeting)
-elif linear image available AND speed ≤ Kitten:
+elif linear image available AND speed ≤ Kitten (2):
     → FindBestQuantization (butteraugli iterative loop)
 else:
     → no refinement (initial quant field used as-is)
 ```
 
-Speed tiers Hare and above skip the butteraugli feedback loop entirely,
+Speed tiers Hare (5) and above skip the butteraugli feedback loop entirely,
 relying on the initial AQ map alone. This is the single largest quality gap
 between fast and slow encoding speeds.

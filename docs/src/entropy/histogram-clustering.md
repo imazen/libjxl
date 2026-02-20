@@ -83,9 +83,9 @@ valid only if `v == max(version[i], version[j])`. Stale entries are skipped when
 
 | Speed Tier | Clustering | Max Clusters | Metric |
 |------------|-----------|--------------|--------|
-| > Falcon | `kFastest` | 4 | Jensen-Shannon |
-| Falcon–Squirrel | `kFast` | 128 | Jensen-Shannon |
-| ≤ Tortoise | `kBest` | 128 | ANS Population Cost + merge |
+| > Falcon (7) | `kFastest` | 4 | Jensen-Shannon |
+| Falcon (7)–Squirrel (3) | `kFast` | 128 | Jensen-Shannon |
+| ≤ Tortoise (1) | `kBest` | 128 | ANS Population Cost + merge |
 
 ## Context Map Encoding
 

@@ -85,17 +85,17 @@ the mode is lossy or fast.
 
 ### Slow Lossless Mode (Per-Group Search)
 
-For lossless at speed ≤ Hare with auto colorspace, the encoder searches RCT
+For lossless at speed ≤ Hare (5) with auto colorspace, the encoder searches RCT
 types by estimating cost with `EstimateCost()` — a Shannon entropy estimate
 using the Gradient predictor with 34 contexts:
 
 | Speed | Types Tried |
 |-------|------------|
-| Hare | 4 |
-| Wombat | 5 |
-| Squirrel | 7 |
-| Kitten | 9 |
-| Tortoise | 19 |
+| Hare (5) | 4 |
+| Wombat (4) | 5 |
+| Squirrel (3) | 7 |
+| Kitten (2) | 9 |
+| Tortoise (1) | 19 |
 
 Search order (by expected usefulness):
 ```
