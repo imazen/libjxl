@@ -12,14 +12,12 @@
 
 ## Phase 3: Color Science
 - [x] 11-xyb-color-space (opsin absorbance, XYB encoding)
-- [ ] 12-transfer-functions (sRGB, PQ, HLG, gamma)
-- [ ] 13-color-management (CMS interface, ICC profiles)
-- [ ] 14-tone-mapping (HDR→SDR, display adaptation)
+- [x] 12-color-management (transfer functions, CMS interface, ICC profiles, tone mapping)
 
 ## Phase 4: Transforms + Quantization
 - [x] 15-dct-family (DCT-II/III, sizes, SIMD)
 - [x] 16-ac-strategy (block size selection heuristics, COST FUNCTIONS)
-- [ ] 17-coefficient-order (scan order optimization)
+- [x] 17-coefficient-order (scan order optimization, Lehmer code)
 - [x] 18-quantization (quant matrices, DC/AC quantization, MULTIPLIERS)
 
 ## Phase 5: Perceptual Models
@@ -35,16 +33,10 @@
 
 ## Phase 8: Encoder Pipeline
 - [x] 31-pipeline-overview (full encoder flow, DECISION TREE)
-- [ ] 32-frame-setup (FrameHeader, metadata, params)
-- [ ] 33-vardct-path (heuristics → DCT → quant → tokens, COST ANALYSIS)
-- [ ] 34-group-encoding (256×256 groups, parallel encoding)
-- [ ] 35-progressive (DC/AC/QAC progressive modes)
-- [ ] 36-bitstream-assembly (TOC, group permutation, output)
+- [x] 32-encoder-pipeline (frame setup, group encoding, progressive, bitstream assembly)
 
 ## Phase 9: Architecture
-- [ ] 37-highway-simd (HWY abstraction, -inl.h pattern)
-- [ ] 38-render-pipeline (decoder pipeline reference)
-- [ ] 39-threading (ThreadPool, RunOnPool, group parallelism)
+- [x] 37-architecture (Highway SIMD, render pipeline, threading model)
 
 ## Chapters Written
 - [x] foundations/base-primitives.md
@@ -57,9 +49,35 @@
 - [x] entropy/histogram-clustering.md
 - [x] entropy/lz77.md
 - [x] entropy/context-modeling.md
+- [x] color/xyb-color-space.md
+- [x] color/transfer-functions.md
+- [x] color/color-management.md
+- [x] color/tone-mapping.md
+- [x] transforms/dct-family.md
+- [x] transforms/ac-strategy.md
+- [x] transforms/coefficient-order.md
+- [x] transforms/quantization.md
+- [x] perceptual/butteraugli.md
+- [x] perceptual/adaptive-quantization.md
+- [x] perceptual/gaborish.md
+- [x] modular/modular-overview.md
+- [x] modular/rct.md
+- [x] modular/squeeze.md
+- [x] modular/palette.md
+- [x] modular/prediction-trees.md
+- [x] features/chroma-from-luma.md
+- [x] features/noise.md
+- [x] features/patches.md
+- [x] features/splines.md
+- [x] encoder/pipeline-overview.md
+- [x] encoder/frame-setup.md
+- [x] encoder/vardct-path.md
+- [x] encoder/group-encoding.md
+- [x] encoder/progressive.md
+- [x] encoder/bitstream-assembly.md
+- [x] architecture/highway-simd.md
+- [x] architecture/render-pipeline.md
+- [x] architecture/threading.md
 
-## Remaining Analyses Needed
-- 12-transfer-functions, 13-color-management, 14-tone-mapping
-- 17-coefficient-order
-- 32-frame-setup, 33-vardct-path, 34-group-encoding, 35-progressive, 36-bitstream-assembly
-- 37-highway-simd, 38-render-pipeline, 39-threading
+## Status: COMPLETE
+All 15 analysis notes and 39 chapters written.
