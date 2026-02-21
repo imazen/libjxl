@@ -74,3 +74,9 @@
 - [Highway SIMD](architecture/highway-simd.md)
 - [Render Pipeline](architecture/render-pipeline.md)
 - [Threading Model](architecture/threading.md)
+
+# Tracking
+
+- [Recent Changes (2026)](tracking/changes.md)
+- [Known Issues](tracking/issues.md)
+- [Future Directions](tracking/future.md)
