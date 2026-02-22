@@ -1,0 +1,623 @@
+%% JPEG XL Encoder Pipeline — Input to Bitstream
+flowchart TD
+
+    %% ═══════════════════════════════════════
+    %% INPUT
+    %% ═══════════════════════════════════════
+    INPUT["Input Image<br/>sRGB u8/u16/f32<br/>or JPEG file"]
+
+    INPUT --> JPEG_CHECK{"JPEG<br/>input?"}
+    JPEG_CHECK -->|Yes| JPEG_REENC
+    JPEG_CHECK -->|No| COLOR_IN
+
+    %% ═══════════════════════════════════════
+    %% JPEG REENCODING
+    %% ═══════════════════════════════════════
+    subgraph JPEG_REENC["JPEG Lossless Reencoding"]
+        direction TB
+        JP_PARSE["Parse JPEG<br/>extract markers, tables,<br/>DCT coefficients"]
+        JP_PARSE --> JP_SPLIT{"Split data"}
+        JP_SPLIT --> JP_COEFF["DCT coefficients<br/>→ JXL codestream<br/>(VarDCT, no requantization)"]
+        JP_SPLIT --> JP_META["JPEG metadata<br/>quant tables, Huffman codes,<br/>scan info, markers"]
+        JP_META --> JP_SERIAL["Serialize JPEGData<br/>(Bundle visitor pattern)"]
+        JP_SERIAL --> JP_BROTLI["Brotli-compress<br/>APP/COM marker data"]
+        JP_BROTLI --> JP_JBRD["jbrd box<br/>(container format)"]
+    end
+
+    %% ═══════════════════════════════════════
+    %% COLOR MANAGEMENT
+    %% ═══════════════════════════════════════
+    subgraph COLOR_IN["Color Management — Input"]
+        direction TB
+        CM_PRE["Preprocess<br/>libjxl SIMD TF decode"]
+        CM_PRE --> CM_OOTF1["HLG OOTF forward<br/>(if applicable)"]
+        CM_OOTF1 --> CM_EXP["Channel expand<br/>1→3 or CMYK invert"]
+        CM_EXP --> CM_CMS{"skip_lcms?"}
+        CM_CMS -->|No| CM_TRANS["skcms_Transform /<br/>cmsDoTransform"]
+        CM_CMS -->|Yes| CM_COPY["memcpy"]
+        CM_TRANS --> CM_CON["Channel contract<br/>3→1 if gray dest"]
+        CM_COPY --> CM_CON
+        CM_CON --> CM_OOTF2["HLG OOTF inverse<br/>(if applicable)"]
+        CM_OOTF2 --> CM_POST["Postprocess<br/>libjxl SIMD TF encode"]
+
+        subgraph TF_SEL["Transfer Function Selection"]
+            direction LR
+            TF_LIN["Linear light"] --> TF_WHICH{{"TF?"}}
+            TF_WHICH -->|sRGB| TF_SRGB["Rational poly approx"]
+            TF_WHICH -->|PQ| TF_PQ["Rational poly approx"]
+            TF_WHICH -->|HLG| TF_HLG["FastLog2/FastPow2"]
+            TF_WHICH -->|BT.709| TF_709["Power function"]
+            TF_WHICH -->|DCI| TF_DCI["Gamma 2.6"]
+        end
+    end
+
+    subgraph XYB_FWD["Linear RGB → XYB Conversion"]
+        direction TB
+        XYB_IN["Linear sRGB"] --> XYB_OPSIN["OpsinAbsorbance<br/>3×3 matrix × RGB + bias"]
+        XYB_OPSIN --> XYB_CLAMP["ZeroIfNegative<br/>(clamp ≥ 0)"]
+        XYB_CLAMP --> XYB_CBRT["CubeRootAndAdd<br/>cbrt(x) + neg_bias_cbrt"]
+        XYB_CBRT --> XYB_MIX["X = 0.5×(L−M)<br/>Y = 0.5×(L+M)<br/>B = S"]
+        XYB_MIX --> XYB_OUT["XYB Image"]
+    end
+
+    subgraph TONE_MAP["Tone Mapping (HDR → SDR)"]
+        direction TB
+        TM_HDR["HDR linear RGB<br/>(0–10000 nits)"]
+        TM_HDR --> TM_LUM["Compute luminance"]
+        TM_LUM --> TM_PQE["PQ-encode luminance"]
+        TM_PQE --> TM_NORM["Normalize to mastering range"]
+        TM_NORM --> TM_KNEE{"Above knee<br/>point ks?"}
+        TM_KNEE -->|No| TM_PASS["Pass through"]
+        TM_KNEE -->|Yes| TM_SPLINE["Hermite spline compression"]
+        TM_PASS --> TM_LIFT["Black level lift"]
+        TM_SPLINE --> TM_LIFT
+        TM_LIFT --> TM_PQD["PQ-decode → linear"]
+        TM_PQD --> TM_SCALE["Scale RGB by<br/>new_lum / old_lum"]
+        TM_SCALE --> TM_SDR["SDR linear RGB"]
+    end
+
+    COLOR_IN --> XYB_FWD
+    TONE_MAP -.->|"if HDR input"| XYB_FWD
+
+    %% ═══════════════════════════════════════
+    %% ICC ENCODING
+    %% ═══════════════════════════════════════
+    subgraph ICC_ENC["ICC Profile Encoding"]
+        direction TB
+        ICC_RAW["Raw ICC profile<br/>(200–10,000 bytes)"]
+        ICC_RAW --> ICC_HDR["Phase 1: Header prediction<br/>128 bytes, adaptive template"]
+        ICC_HDR --> ICC_TAGS["Phase 2: Tag list encoding<br/>keyword recognition"]
+        ICC_TAGS --> ICC_CONTENT["Phase 3: Content encoding<br/>type-aware unshuffle"]
+        ICC_CONTENT --> ICC_RES["Residual stream"]
+        ICC_RES --> ICC_ENT["Phase 4: Entropy coding<br/>41 ANS contexts, Huffman"]
+        ICC_ENT --> ICC_BITS["Compressed ICC<br/>5–15% of original"]
+    end
+
+    %% ═══════════════════════════════════════
+    %% MODE DECISION + FRAME SETUP
+    %% ═══════════════════════════════════════
+    XYB_FWD --> ENC_DECISION{"Encoding Mode?"}
+    ENC_DECISION -->|VarDCT| VARDCT_ENTRY
+    ENC_DECISION -->|Modular| MODULAR_ENTRY
+
+    subgraph FRAME_SETUP["Frame Header Setup"]
+        direction LR
+        FS_CP["CompressParams"] --> FS_FH["FrameHeader"]
+        FS_FH --> FS_ENC["kVarDCT / kModular"]
+        FS_FH --> FS_LF["LoopFilter<br/>Gaborish + EPF"]
+        FS_FH --> FS_PASS["Passes<br/>progressive config"]
+        FS_FH --> FS_FLAGS["Frame flags<br/>noise, patches, splines"]
+        FS_FH --> FS_FD["FrameDimensions<br/>groups, blocks, DC groups"]
+    end
+
+    ENC_DECISION --> FRAME_SETUP
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — FEATURE DETECTION
+    %% ═══════════════════════════════════════
+    VARDCT_ENTRY["VarDCT Entry"]
+
+    subgraph FEAT_DETECT["Feature Detection (≤Squirrel)"]
+        direction TB
+
+        subgraph PATCH_DETECT["Patch Detection"]
+            direction TB
+            PD_OPSIN["Opsin image"] --> PD_SCREEN{"Screenshot<br/>detection"}
+            PD_SCREEN -->|"4×4 flat blocks"| PD_SEED["Background seeds"]
+            PD_SCREEN -->|"No flat areas"| PD_DOTS["Dot detection<br/>(d≥3.0, ≤Squirrel)"]
+            PD_SEED --> PD_BFS["BFS flood-fill<br/>radius 1, ≤50px"]
+            PD_BFS --> PD_BG["Background image<br/>+ mask"]
+            PD_BG --> PD_CC["Connected components<br/>of foreground"]
+            PD_CC --> PD_VALID{"Valid patch?<br/>≤32×32, peak≥2"}
+            PD_VALID -->|Yes| PD_QUANT["Quantize difference"]
+            PD_QUANT --> PD_DEDUP["Sort + deduplicate"]
+            PD_DEDUP --> PD_PACK["Bin-pack into ref frame"]
+            PD_PACK --> PD_SUB["Subtract patches<br/>from opsin"]
+        end
+
+        subgraph SPLINE_DETECT["Spline Detection"]
+            direction TB
+            SPL_CP["Control points<br/>(float x,y)"] --> SPL_CATMULL["Catmull-Rom<br/>interpolation"]
+            SPL_CATMULL --> SPL_SAMPLE["Sample at 1px distance"]
+            SPL_SAMPLE --> SPL_COLOR["Color DCTs<br/>32 coeff × 3 channels"]
+            SPL_SAMPLE --> SPL_SIGMA["Sigma DCT<br/>32 coefficients"]
+            SPL_COLOR --> SPL_SPLAT["Gaussian splatting"]
+            SPL_SIGMA --> SPL_SPLAT
+        end
+
+        subgraph NOISE_EST["Noise Estimation"]
+            direction TB
+            NE_OPSIN["Opsin image"] --> NE_SAD["Score 8×8 blocks<br/>patch-based SAD"]
+            NE_SAD --> NE_HIST["256-bin SAD histogram"]
+            NE_HIST --> NE_MODE["Find mode"]
+            NE_MODE --> NE_THR{"threshold<br/>≤ 0.15?"}
+            NE_THR -->|No| NE_NONE["No noise params"]
+            NE_THR -->|Yes| NE_FLAT["Select flat blocks"]
+            NE_FLAT --> NE_LAP["Laplacian filter"]
+            NE_LAP --> NE_OBS["(intensity, noise_level)<br/>observations"]
+            NE_OBS --> NE_SCG["SCG Optimization<br/>≤40 iters"]
+            NE_SCG --> NE_LUT["NoiseParams LUT<br/>8 × 10-bit values"]
+        end
+    end
+
+    VARDCT_ENTRY --> FEAT_DETECT
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — ADAPTIVE QUANTIZATION
+    %% ═══════════════════════════════════════
+    subgraph AQ_PIPELINE["Adaptive Quantization Pipeline"]
+        direction TB
+        AQ_XYB["XYB Image"] --> AQ_LAP["Per-pixel Laplacian<br/>(Y channel)"]
+        AQ_LAP --> AQ_M1["mask1x1: per-pixel masking"]
+        AQ_LAP --> AQ_DS["4×4 downsample"]
+        AQ_DS --> AQ_FE["FuzzyErosion<br/>(soft morphological min)"]
+        AQ_FE --> AQ_CM["ComputeMask<br/>(rational function)"]
+        AQ_CM --> AQ_GM["GammaModulation<br/>(luminance correction)"]
+        AQ_GM --> AQ_HF["HfModulation<br/>(high-frequency content)"]
+        AQ_HF --> AQ_BM["BlueModulation<br/>(S-cone compensation)"]
+        AQ_BM --> AQ_EXP["exp2(modulated_value)"]
+        AQ_EXP --> AQ_MAP["Per-block AQ map"]
+    end
+
+    FEAT_DETECT --> AQ_PIPELINE
+
+    subgraph QUANT_INIT["Quantization Field Init"]
+        direction TB
+        QI_BT["butteraugli_target"] --> QI_IQD["InitialQuantDC"]
+        QI_BT --> QI_IQF["InitialQuantField"]
+        QI_IQD --> QI_QDC["quant_dc (float)"]
+        QI_IQF --> QI_QF["quant_field (ImageF)"]
+        QI_QF --> QI_CGSQ["ComputeGlobalScaleAndQuant"]
+        QI_QDC --> QI_CGSQ
+        QI_CGSQ --> QI_GS["global_scale_ (int)"]
+        QI_CGSQ --> QI_QDI["quant_dc_ (int)"]
+        QI_QF --> QI_RQF["raw_quant_field (ImageI)"]
+    end
+
+    AQ_PIPELINE --> QUANT_INIT
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — PER-TILE PROCESSING
+    %% ═══════════════════════════════════════
+    subgraph TILE_PROC["Per 64×64 Tile Processing (parallel)"]
+        direction TB
+
+        subgraph CFL_OPT["CfL Factor Optimization"]
+            direction TB
+            CFL_TILE["64×64 pixel tile"] --> CFL_DCT["Forward DCT<br/>all 3 XYB channels"]
+            CFL_DCT --> CFL_DC["Extract DC values"]
+            CFL_DCT --> CFL_AC["Weight AC coefficients"]
+            CFL_AC --> CFL_X["FindBestMultiplier<br/>X-from-Y (base=0)"]
+            CFL_AC --> CFL_B["FindBestMultiplier<br/>B-from-Y (base=1.0)"]
+            CFL_X --> CFL_NEWTON["Newton Loop<br/>≤20 iters"]
+            CFL_B --> CFL_NEWTON
+            CFL_NEWTON --> CFL_SHRINK["Towards-zero shrinkage<br/>threshold = 2.6"]
+            CFL_SHRINK --> CFL_ROUND["Round + clamp<br/>to int8 [-128,127]"]
+            CFL_ROUND --> CFL_MAP["ytox_map / ytob_map<br/>per-tile CfL factors"]
+        end
+
+        subgraph ACS_SELECT["AC Strategy Selection"]
+            direction TB
+            ACS_IN["XYB + Quant + Mask"] --> ACS_P1["Phase 1: Score 10 candidates<br/>per 8×8 block"]
+            ACS_P1 --> ACS_P1D{"Best < 8×8 cost?"}
+            ACS_P1D -->|Yes| ACS_P1A["Accept best<br/>(DCT4, IDENTITY, etc.)"]
+            ACS_P1D -->|No| ACS_P1B["Keep DCT8×8"]
+            ACS_P1A --> ACS_P2R
+            ACS_P1B --> ACS_P2R
+            ACS_P2R["Phase 2R: Rectangular merges<br/>(16×8, 16×32, 64×32)"]
+            ACS_P2R --> ACS_P2S["Phase 2S: Square merges<br/>(16×16, 32×32, 64×64)"]
+            ACS_P2S --> ACS_P3["Phase 3: Non-aligned merges<br/>(≤Kitten: 16×16, 32×32)"]
+            ACS_P3 --> ACS_OUT["AcStrategyImage<br/>per-block transform type"]
+        end
+
+        CFL_OPT --> ACS_SELECT
+    end
+
+    QUANT_INIT --> TILE_PROC
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — GABORISH
+    %% ═══════════════════════════════════════
+    subgraph GABORISH_ENC["Gaborish — Encoder Side"]
+        direction TB
+        GAB_ORIG["Original XYB"] --> GAB_EN{"Gaborish enabled?<br/>(≤Hare, dist>0.5)"}
+        GAB_EN -->|Yes| GAB_SHARP["GaborishInverse<br/>5×5 pre-sharpening"]
+        GAB_EN -->|No| GAB_PASS["Pass through"]
+    end
+
+    TILE_PROC --> GABORISH_ENC
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — DCT TRANSFORMS
+    %% ═══════════════════════════════════════
+    subgraph DCT_XFORM["Forward DCT Transforms"]
+        direction TB
+        DCT_PIX["TransformFromPixels"] --> DCT_STRAT{"Strategy?"}
+        DCT_STRAT -->|"DCT 8×8..256×256"| DCT_SCALED["ComputeScaledDCT‹R,C›"]
+        DCT_STRAT -->|IDENTITY| DCT_ID["Pixel-domain coding"]
+        DCT_STRAT -->|DCT2×2| DCT_HAAR["Recursive 2×2 Haar"]
+        DCT_STRAT -->|"DCT4×4/4×8"| DCT_SUB["Sub-block DCTs + Hadamard"]
+        DCT_STRAT -->|AFV0-3| DCT_AFV["AFVDCT4×4 + DCT4×4 + DCT4×8"]
+        DCT_SCALED --> DCT_ROW["1D DCT along rows"]
+        DCT_ROW --> DCT_TRANS["Transpose"]
+        DCT_TRANS --> DCT_COL["1D DCT along columns"]
+    end
+
+    GABORISH_ENC --> DCT_XFORM
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — QUANTIZATION
+    %% ═══════════════════════════════════════
+    subgraph QUANT_APPLY["Quantization"]
+        direction TB
+        QA_COEFF["DCT coefficients"] --> QA_BLOCK["QuantizeBlockAC<br/>global_scale × raw_quant_field"]
+        QA_BLOCK --> QA_OUT["Quantized coefficients"]
+    end
+
+    DCT_XFORM --> QUANT_APPLY
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — BUTTERAUGLI RD LOOP
+    %% ═══════════════════════════════════════
+    subgraph BA_RD_LOOP["Butteraugli RD Loop (≤Kitten, 2-5 iters)"]
+        direction TB
+
+        BA_QF["Current quant_field"] --> BA_ENC["Encode: DCT + quantize<br/>+ dequantize (roundtrip)"]
+        BA_ENC --> BA_DEC["Decode: IDCT + Gaborish<br/>+ EPF reconstruction"]
+        BA_DEC --> BA_COMP["Butteraugli: compute<br/>per-pixel distortion map"]
+
+        subgraph BUTTERAUGLI_METRIC["Butteraugli Metric"]
+            direction TB
+            BM_REF["Linear sRGB Ref"] --> BM_OD0["OpsinDynamicsImage"]
+            BM_DIST["Linear sRGB Distorted"] --> BM_OD1["OpsinDynamicsImage"]
+            BM_OD0 --> BM_SF0["SeparateFrequencies"]
+            BM_OD1 --> BM_SF1["SeparateFrequencies"]
+            BM_SF0 --> BM_PI0["PsychoImage<br/>UHF, HF, MF, LF"]
+            BM_SF1 --> BM_PI1["PsychoImage"]
+            BM_PI0 --> BM_MASK["Masking"]
+            BM_PI1 --> BM_MASK
+            BM_PI0 --> BM_MALTA["Malta Cross-Feature<br/>Detection"]
+            BM_PI1 --> BM_MALTA
+            BM_PI0 --> BM_L2["Weighted L2 Diffs"]
+            BM_PI1 --> BM_L2
+            BM_MALTA --> BM_AC["block_diff_ac"]
+            BM_L2 --> BM_AC
+            BM_L2 --> BM_DC["block_diff_dc"]
+            BM_MASK --> BM_COMBINE["CombineChannelsToDiffmap"]
+            BM_AC --> BM_COMBINE
+            BM_DC --> BM_COMBINE
+            BM_COMBINE --> BM_DIFFMAP["Per-pixel diffmap"]
+            BM_DIFFMAP --> BM_SUB["Multi-resolution recursion<br/>(2× downsample, repeat)"]
+            BM_SUB --> BM_FINAL["Final diffmap"]
+        end
+
+        BA_COMP --> BA_TILE["TileDistMap: aggregate<br/>per-block (16th-norm)"]
+        BA_TILE --> BA_CMP{"tile_dist vs<br/>target?"}
+        BA_CMP -->|"Over target"| BA_UP["Increase quant_field<br/>quant *= diff"]
+        BA_CMP -->|"Under target"| BA_DOWN["Gently decrease<br/>quant *= pow(diff, 0.2)"]
+        BA_UP --> BA_MORE{"More iterations?"}
+        BA_DOWN --> BA_MORE
+        BA_MORE -->|Yes| BA_ENC
+        BA_MORE -->|No| BA_FINAL["Final quant_field"]
+
+        subgraph ORIG_CMP["Original Comparison Round (iter 1)"]
+            OC_PULL["Pull toward initial:<br/>0.4×current + 0.6×initial"]
+            OC_BOUNDS["Enforce deviation bounds"]
+        end
+    end
+
+    QUANT_APPLY --> BA_RD_LOOP
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — AR SHARPNESS
+    %% ═══════════════════════════════════════
+    subgraph AR_FEEDBACK["AR Sharpness Feedback (≤Wombat)"]
+        direction TB
+        AR_CAND["Define candidates:<br/>{0,2,7} if dist≤4.5<br/>{0,4} if dist>4.5"]
+        AR_CAND --> AR_RECON["Full reconstruct per candidate:<br/>dequantize → IDCT → Gaborish → EPF"]
+        AR_RECON --> AR_ERR["Per-block masked L2 error<br/>vs original pixels"]
+        AR_ERR --> AR_PICK["Pick lowest-error candidate<br/>bias toward 0 (×0.99)"]
+        AR_PICK --> AR_REFINE["Second pass: add entropy<br/>cost of sharpness signaling"]
+        AR_REFINE --> AR_SHARP["Final per-block<br/>sharpness map (0-7)"]
+    end
+
+    BA_RD_LOOP --> AR_FEEDBACK
+
+    %% ═══════════════════════════════════════
+    %% VARDCT — BLOCK CONTEXT + COEFF ORDER
+    %% ═══════════════════════════════════════
+    subgraph BCM["Block Context Model"]
+        direction TB
+        BCM_QT["Quantize +<br/>tokenize"] --> BCM_CLUSTER["Cluster (QF, ACS)<br/>pairs"]
+        BCM_CLUSTER --> BCM_RETOK["Re-tokenize with<br/>new contexts"]
+    end
+
+    subgraph COEFF_ORDER["Coefficient Order Encoding"]
+        direction TB
+        CO_AC["AC coefficients<br/>per block"] --> CO_ZC["Count zeros<br/>per band position"]
+        CO_ZC --> CO_QUANT["Quantize counts<br/>floor(count / √N + 0.1)"]
+        CO_QUANT --> CO_SORT["Sort by zero count<br/>(ascending, stable)"]
+        CO_SORT --> CO_CMP{"Matches<br/>natural order?"}
+        CO_CMP -->|Yes| CO_SKIP["Skip encoding<br/>(use default)"]
+        CO_CMP -->|No| CO_LEHMER["Encode as<br/>Lehmer code"]
+        CO_LEHMER --> CO_ANS["ANS with 8 contexts"]
+    end
+
+    AR_FEEDBACK --> BCM
+    BCM --> COEFF_ORDER
+
+    VARDCT_TOKENS["TokenizeAllCoefficients"]
+    COEFF_ORDER --> VARDCT_TOKENS
+
+    %% ═══════════════════════════════════════
+    %% MODULAR PATH
+    %% ═══════════════════════════════════════
+    MODULAR_ENTRY["Modular Entry"]
+
+    subgraph MODULAR_PIPELINE["Modular Encoding Pipeline"]
+        direction TB
+
+        subgraph MOD_PALETTE["Palette Transform"]
+            direction TB
+            MP_IMG["Multi-channel image"] --> MP_MODE{"Palette mode?"}
+            MP_MODE -->|Single channel| MP_SC["ChannelCompact<br/>sorted value → index"]
+            MP_MODE -->|Multi-ch lossless| MP_MC["Explicit palette<br/>collect unique colors"]
+            MP_MODE -->|Multi-ch lossy| MP_LP["Lossy palette<br/>error diffusion"]
+            MP_SC --> MP_META["Prepend palette<br/>as meta-channel"]
+            MP_MC --> MP_META
+            MP_LP --> MP_META
+            MP_META --> MP_IDX["Image channels<br/>replaced with indices"]
+        end
+
+        subgraph MOD_RCT["RCT Channel Decorrelation"]
+            direction TB
+            RCT_RGB["3-channel input"] --> RCT_PERM["Permute channels<br/>6 options: RGB,GBR,BRG,..."]
+            RCT_PERM --> RCT_XF{"Transform type<br/>(0-6)"}
+            RCT_XF -->|0| RCT_ID["Identity"]
+            RCT_XF -->|1-5| RCT_DIFF["Difference transforms"]
+            RCT_XF -->|6| RCT_YCOCG["YCoCg transform"]
+            RCT_ID --> RCT_OUT["Decorrelated channels"]
+            RCT_DIFF --> RCT_OUT
+            RCT_YCOCG --> RCT_OUT
+        end
+
+        subgraph MOD_SQUEEZE["Squeeze Transform (Responsive)"]
+            direction TB
+            SQZ_CH["Full-resolution channel<br/>W × H"] --> SQZ_CHECK{"min dim > 8?"}
+            SQZ_CHECK -->|Yes| SQZ_H["Horizontal squeeze"]
+            SQZ_H --> SQZ_AVG_H["Averages: W/2 × H<br/>(low-pass)"]
+            SQZ_H --> SQZ_RES_H["Residuals: W/2 × H<br/>(high-pass)"]
+            SQZ_AVG_H --> SQZ_V["Vertical squeeze"]
+            SQZ_V --> SQZ_AVG_HV["Averages: W/2 × H/2<br/>(LL band)"]
+            SQZ_V --> SQZ_RES_V["Residuals: W/2 × H/2<br/>(LH band)"]
+            SQZ_AVG_HV -->|"next level"| SQZ_CHECK
+            SQZ_CHECK -->|No| SQZ_DONE["Encode: LL first<br/>then residuals coarse→fine"]
+        end
+
+        subgraph MOD_MATREE["MA Tree Prediction"]
+            direction TB
+            MA_PX["Pixel at (x,y)"] --> MA_PROPS["Compute 16+ properties<br/>channel, group, coords,<br/>neighbors, gradients, WP error"]
+            MA_PROPS --> MA_WALK["Walk MA tree"]
+            MA_WALK --> MA_NODE{"property ≤ splitval?"}
+            MA_NODE -->|Yes| MA_LEFT["Left child"]
+            MA_NODE -->|No| MA_RIGHT["Right child"]
+            MA_LEFT --> MA_NODE
+            MA_RIGHT --> MA_NODE
+            MA_NODE -->|Leaf| MA_LEAF["predictor + context<br/>+ offset + multiplier"]
+            MA_LEAF --> MA_PRED["prediction = PredictOne(predictor)"]
+            MA_PRED --> MA_RES["residual = pixel − prediction − offset"]
+            MA_RES --> MA_TOK["Token(context,<br/>PackSigned(residual / multiplier))"]
+        end
+
+        MOD_PALETTE --> MOD_RCT
+        MOD_RCT --> MOD_SQUEEZE
+        MOD_SQUEEZE --> MOD_MATREE
+    end
+
+    MODULAR_ENTRY --> MODULAR_PIPELINE
+
+    MODULAR_TOKENS["Modular Tokens"]
+    MODULAR_PIPELINE --> MODULAR_TOKENS
+
+    %% ═══════════════════════════════════════
+    %% ENTROPY CODING
+    %% ═══════════════════════════════════════
+    subgraph ENTROPY["Entropy Coding — ANS + Context Modeling"]
+        direction TB
+        ENT_TOKENS["Token stream"] --> ENT_CTX["Context modeling<br/>histogram clustering"]
+        ENT_CTX --> ENT_HI["Hybrid integers<br/>split/config/raw bits"]
+        ENT_HI --> ENT_ANS["rANS encoding<br/>L=1«12 precision"]
+        ENT_ANS --> ENT_BITS["Encoded bitstream<br/>sections"]
+
+        subgraph LZ77_OPT["LZ77 (optional)"]
+            direction LR
+            LZ_IN["Token sequence"] --> LZ_MATCH["Match finder<br/>min_symbol, min_length"]
+            LZ_MATCH --> LZ_OUT["LZ77 + literal tokens"]
+        end
+    end
+
+    VARDCT_TOKENS --> ENTROPY
+    MODULAR_TOKENS --> ENTROPY
+
+    %% ═══════════════════════════════════════
+    %% PROGRESSIVE + LF FRAME
+    %% ═══════════════════════════════════════
+    subgraph PROGRESSIVE["Progressive Encoding"]
+        direction TB
+        PROG_COEFF["Quantized AC<br/>coefficients"] --> PROG_SPLIT["SplitACCoefficients"]
+        PROG_SPLIT --> PROG_P0["Pass 0: DC + VLF<br/>(2 coefficients)"]
+        PROG_SPLIT --> PROG_P1["Pass 1: + LF<br/>(3 coefficients)"]
+        PROG_SPLIT --> PROG_P2["Pass 2: Full AC<br/>(8 coefficients)"]
+    end
+
+    subgraph LF_FRAME["LF Frame (Progressive DC)"]
+        direction TB
+        LFF_FULL["Full VarDCT frame"] --> LFF_DC["Extract DC coefficients<br/>1 per 8×8 block"]
+        LFF_DC --> LFF_ENC["Encode as LfFrame<br/>modular, distance × 0.02"]
+        LFF_ENC --> LFF_MAIN["Main frame<br/>kUseDcFrame flag"]
+
+        subgraph LFF_L2["progressive_dc = 2"]
+            LFF2_VD["LfFrame level 2<br/>VarDCT, distance × 0.1"]
+            LFF2_VD --> LFF2_DC["Extract DC of DC"]
+            LFF2_DC --> LFF2_MOD["LfFrame level 1<br/>modular, distance × 0.02"]
+        end
+    end
+
+    %% ═══════════════════════════════════════
+    %% GROUP ENCODING
+    %% ═══════════════════════════════════════
+    subgraph GROUP_ENC["Group Structure — Parallel Processing"]
+        direction TB
+        GRP_IMG["Padded image"] --> GRP_SPLIT["Split into groups<br/>256×256 pixels (default)"]
+        GRP_SPLIT --> GRP_DCG["DC Global (index 0)<br/>patches, splines, noise,<br/>DC dequant, quantizer,<br/>block context, CfL DC,<br/>modular global"]
+        GRP_SPLIT --> GRP_DC["DC Groups (1..N_dc)<br/>DC precision + stream,<br/>modular DC, AC metadata"]
+        GRP_SPLIT --> GRP_ACG["AC Global (N_dc+1)<br/>dequant matrices,<br/>histograms, coeff orders"]
+        GRP_SPLIT --> GRP_AC["AC Groups (N_dc+2..end)<br/>histogram selector +<br/>tokenized coefficients +<br/>modular AC streams"]
+        GRP_DC --> GRP_PAR1["RunOnPool<br/>(parallel)"]
+        GRP_AC --> GRP_PAR2["RunOnPool<br/>(parallel)"]
+    end
+
+    ENTROPY --> GROUP_ENC
+
+    %% ═══════════════════════════════════════
+    %% BITSTREAM ASSEMBLY
+    %% ═══════════════════════════════════════
+    subgraph BITSTREAM["Bitstream Assembly"]
+        direction TB
+        BS_SPEC["Special frames<br/>(DC frames)"] --> BS_PREPEND["Byte-aligned prepend"]
+        BS_PREPEND --> BS_FH["Write FrameHeader"]
+        BS_FH --> BS_PERM{"Center-first<br/>ordering?"}
+        BS_PERM -->|Yes| BS_REORDER["Permute group order<br/>by distance from center"]
+        BS_PERM -->|No| BS_TOC
+        BS_REORDER --> BS_TOC["WriteGroupOffsets"]
+        BS_TOC --> BS_TOCBITS["1 bit: permutation?<br/>+ Lehmer code if yes<br/>+ byte-pad<br/>+ U32 sizes per section<br/>+ byte-pad"]
+        BS_TOCBITS --> BS_SECTIONS["Append group_codes<br/>byte-aligned"]
+        BS_SECTIONS --> BS_OUTPUT["Final frame bytes"]
+    end
+
+    GROUP_ENC --> BITSTREAM
+    PROGRESSIVE -.-> BITSTREAM
+    LF_FRAME -.-> BITSTREAM
+    JP_COEFF --> BITSTREAM
+
+    %% ═══════════════════════════════════════
+    %% CONTAINER FORMAT
+    %% ═══════════════════════════════════════
+    subgraph CONTAINER["JXL Container Format"]
+        direction TB
+        CTR_SIG["Signature Box<br/>00 00 00 0C 4A 58 4C 20 0D 0A 87 0A"]
+        CTR_SIG --> CTR_FTYP["File Type Box<br/>ftyp: brand=jxl"]
+        CTR_FTYP --> CTR_LEVEL{"Level box?"}
+        CTR_LEVEL -->|"Level > 5"| CTR_JXLL["jxll box<br/>1-byte level indicator"]
+        CTR_LEVEL -->|"Level 5"| CTR_META
+        CTR_JXLL --> CTR_META{"Metadata?"}
+        CTR_META -->|Exif| CTR_EXIF["Exif box<br/>4-byte offset + TIFF"]
+        CTR_META -->|XMP| CTR_XML["xml box<br/>raw XML document"]
+        CTR_META -->|None| CTR_CS
+        CTR_EXIF --> CTR_CS{"Codestream<br/>split?"}
+        CTR_XML --> CTR_CS
+        CTR_CS -->|Single| CTR_JXLC["jxlc box<br/>complete codestream"]
+        CTR_CS -->|"Split (JPEG)"| CTR_JXLP["jxlp boxes<br/>4-byte index + partial"]
+        CTR_JXLP --> CTR_JBRD["jbrd box<br/>JPEG reconstruction"]
+        CTR_JBRD --> CTR_JXLP2["jxlp (continued)"]
+    end
+
+    BS_OUTPUT --> CONTAINER
+    ICC_BITS -.-> CONTAINER
+    JP_JBRD -.-> CONTAINER
+
+    %% ═══════════════════════════════════════
+    %% ANIMATION
+    %% ═══════════════════════════════════════
+    subgraph ANIMATION["Animation Frame Sequencing"]
+        direction TB
+        ANIM_HDR["AnimationHeader<br/>tps=30/1, loops=0"]
+        ANIM_HDR --> ANIM_F0["Frame 0<br/>duration=30, blend=Replace<br/>save_as_reference=1"]
+        ANIM_F0 --> ANIM_F1["Frame 1<br/>duration=30, blend=Alpha<br/>source=1"]
+        ANIM_F1 --> ANIM_FN["Frame N<br/>duration=0, is_last=true"]
+
+        subgraph ANIM_REFS["Reference Slots (0-3)"]
+            ANIM_S0["Slot 0"]
+            ANIM_S1["Slot 1"]
+            ANIM_S2["Slot 2"]
+            ANIM_S3["Slot 3"]
+        end
+    end
+
+    ANIMATION -.->|"multi-frame"| CONTAINER
+
+    CONTAINER --> OUTPUT["JPEG XL File (.jxl)"]
+
+    %% ═══════════════════════════════════════
+    %% INFRASTRUCTURE
+    %% ═══════════════════════════════════════
+    subgraph THREADING["Threading Model"]
+        direction LR
+        TH_API["JxlParallelRunner<br/>(C callback)"] --> TH_TP["ThreadPool<br/>(C++ wrapper)"]
+        TH_TP --> TH_ROP["RunOnPool(begin, end,<br/>init_func, data_func)"]
+        TH_ROP --> TH_INIT["init_func(num_threads)<br/>per-thread scratch"]
+        TH_ROP --> TH_WORK["data_func(task, thread)<br/>process one group"]
+    end
+
+    THREADING -.->|"parallelizes"| GROUP_ENC
+    THREADING -.->|"parallelizes"| TILE_PROC
+
+    subgraph HIGHWAY["Highway SIMD"]
+        direction LR
+        HW_FT["foreach_target.h"] --> HW_T1["SSE4"]
+        HW_FT --> HW_T2["AVX2"]
+        HW_FT --> HW_T3["AVX3"]
+        HW_T1 --> HW_RT["Runtime dispatch<br/>→ best target"]
+        HW_T2 --> HW_RT
+        HW_T3 --> HW_RT
+    end
+
+    HIGHWAY -.->|"accelerates"| DCT_XFORM
+    HIGHWAY -.->|"accelerates"| COLOR_IN
+
+    subgraph SERIAL_WRITE["Serialization (Write Path)"]
+        direction LR
+        SW_CE["CanEncode<br/>(compute bits)"] --> SW_WM["WithMaxBits<br/>(pre-allocate)"]
+        SW_WM --> SW_WV["WriteVisitor<br/>(write bits)"]
+        SW_WV --> SW_RC["ReclaimAndCharge<br/>(shrink unused)"]
+    end
+
+    SERIAL_WRITE -.->|"serializes"| BITSTREAM
+
+    subgraph MEMORY["Memory Model"]
+        direction LR
+        MEM_MM["JxlMemoryManager"] --> MEM_AM["AlignedMemory"]
+        MEM_AM --> MEM_P["Image3F<br/>3 planes, row-padded"]
+    end
+
+    MEMORY -.->|"backing store"| XYB_FWD
+
+    %% ═══════════════════════════════════════
+    %% STYLES
+    %% ═══════════════════════════════════════
+    style INPUT fill:#4a9,stroke:#2a7,color:#fff
+    style OUTPUT fill:#49a,stroke:#27a,color:#fff
+    style VARDCT_ENTRY fill:#e95,stroke:#c73,color:#fff
+    style MODULAR_ENTRY fill:#59e,stroke:#37c,color:#fff
+    style VARDCT_TOKENS fill:#e95,stroke:#c73,color:#fff
+    style MODULAR_TOKENS fill:#59e,stroke:#37c,color:#fff

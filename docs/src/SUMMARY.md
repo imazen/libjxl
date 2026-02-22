@@ -75,6 +75,11 @@
 - [Render Pipeline](architecture/render-pipeline.md)
 - [Threading Model](architecture/threading.md)
 
+# Pipeline Diagrams
+
+- [Encoder Pipeline](diagrams/encoder-pipeline.md)
+- [Decoder Pipeline](diagrams/decoder-pipeline.md)
+
 # Tracking
 
 - [Recent Changes (2026)](tracking/changes.md)
